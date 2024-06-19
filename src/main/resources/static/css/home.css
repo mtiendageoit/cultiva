@@ -1,0 +1,148 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#map {
+  height: 100%
+}
+
+.select2-selection__clear {
+  display: none;
+}
+
+.field-list-item:hover {
+  background-color: #f2f2f7;
+}
+
+.field-list-item-name {
+  line-height: normal;
+  max-width: 11rem;
+}
+
+.chat-sidebox {
+  flex-basis: 18rem !important;
+}
+
+.spinner-grow-xs {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+.d-flex {
+  gap: 0.5rem;
+}
+
+.map-tool-item {
+  font-size: 0.9rem;
+  border: 0;
+  border-radius: 0;
+  outline: none !important;
+}
+
+.map-tool-item:focus {
+  outline: none !important;
+  box-shadow: none;
+}
+
+.map-tool-item:active {
+  background-color: #008655;
+  box-shadow: none;
+}
+
+.icon-btn.btn-sm {
+  width: calc(1.601rem + 2px);
+  line-height: 1.601rem;
+}
+
+.menu-item:hover,
+.menu-item.active {
+  border-radius: .5rem;
+  cursor: pointer;
+  background-color: #f2f2f7;
+}
+
+.menu-item.active {
+  font-weight: 500;
+}
+
+.menu-btn {
+  background-color: #219653;
+  box-shadow: 0px 2px 4px 2px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+
+.menu-btn:hover {
+  background-color: #278d53;
+}
+
+.menu-btn:active {
+  color: rgb(228, 228, 228) !important;
+}
+
+.dropdown-item:not(.disabled).active,
+.dropdown-item:not(.disabled):active {
+  background-color: #02BC77 !important;
+  color: white;
+}
+
+.search-btn-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-btn-input-container .search-btn-form-control {
+  width: 100%;
+  padding-right: 30px;
+  /* Make space for the close button */
+}
+
+.search-btn-input-container .search-btn-close {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.ol-popup {
+  position: absolute;
+  text-align: center;
+  background: rgba(0, 0, 0, .7);
+  color: white;
+  padding: 5px;
+  border-radius: 6px;
+  bottom: 9px;
+  left: -50px;
+  width: 85px;
+}
+
+.ol-popup:after {
+  top: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.ol-popup:after {
+  border-top-color: rgba(0, 0, 0, .7);
+  border-width: 8px;
+  left: 32px;
+}
+
+.indice-statistics-table {
+  border-collapse: separate;
+  border-spacing: 0 2px;
+}
+
+.indice-legend-colors {
+  width: 15px;
+}

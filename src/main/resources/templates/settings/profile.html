@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+
+<html lang="es-MX" class="light-style" xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{settings/layout}">
+
+<head>
+  <title>Cultiva :: Perfil</title>
+</head>
+
+<body>
+  <div layout:fragment="main-content" class="d-flex col flex-column">
+    <div class="flex-grow-1 position-relative">
+      <div class="w-75 h-100">
+        <div class="container-fluid flex-grow-1">
+          <h4 class="font-weight-bold py-3 mb-4">
+            Mi perfil
+          </h4>
+          <div class="card overflow-hidden">
+            <div class="row no-gutters row-bordered row-border-light">
+              <div class="col-md-3 pt-0">
+                <div class="list-group list-group-flush account-settings-links">
+                  <a class="list-group-item list-group-item-action active" data-toggle="list"
+                    href="#account-general">General</a>
+                </div>
+              </div>
+              <div class="col-md-9">
+                <div class="tab-content">
+                  <div class="tab-pane fade show active" id="account-general">
+                    <div class="card-body media align-items-center">
+                      <img th:src="${principal.avatar != null ? principal.avatar : '/img/profile-img.png'}" alt="avatar" class="d-block userAvatarImg" style="width: 80px; height: 80px;">
+                      <div class="media-body ml-4">
+                        <label id="updateAvatarBtn" class="btn btn-outline-success">
+                          Cargar nueva foto
+                          <input id="avatarFile" type="file" class="account-settings-fileinput" accept=".png, .jpg, .jpeg, .gif">
+                        </label>
+                        <div class="text-light small mt-1">
+                          Formatos permitidos PNG, JPG o GIF. Tamaño máximo 1MB
+                        </div>
+                      </div>
+                    </div>
+                    <hr class="border-light m-0">
+                    <div class="card-body">
+                      <form id="generalInfo" autocomplete="off">
+                        <div class="form-group">
+                          <label class="form-label" for="fullname">Nombre completo</label>
+                          <input id="fullname" type="text" class="form-control mb-1" autocomplete="off" maxlength="50"
+                            required>
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label" for="email">Correo electrónico</label>
+                          <input id="email" type="email" class="form-control mb-1" disabled autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label" for="phone">Teléfono</label>
+                          <input id="phone" type="tel" class="form-control" autocomplete="off" maxlength="10"
+                            minlength="10" oninvalid="this.setCustomValidity('Ingresa el teléfono a 10 dígitos')"
+                            oninput="setCustomValidity('')" onkeypress="return soloNumeros(event);"
+                            onpaste="return false;" ondrop="return false;">
+                        </div>
+                        <div class="my-3">
+                          <button id="saveGeneral" type="submit" class="btn btn-success mr-2">Actualizar</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <th:block layout:fragment="scripts">
+    <script th:src="@{/settings/profile.js}"></script>
+  </th:block>
+</body>
+
+</html>

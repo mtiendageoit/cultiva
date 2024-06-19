@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+
+<html lang="es-MX" class="light-style">
+
+<head>
+  <title>Cultiva</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="IE=edge,chrome=1">
+  <meta name="description" content="">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i,900" rel="stylesheet">
+
+  <!-- Icon fonts -->
+  <link rel="stylesheet" href="vendor/fonts/fontawesome.css">
+  <link rel="stylesheet" href="vendor/fonts/ionicons.css">
+  <link rel="stylesheet" href="vendor/fonts/open-iconic.css">
+
+  <!-- Core stylesheets -->
+  <link rel="stylesheet" href="vendor/css/rtl/bootstrap.css">
+  <link rel="stylesheet" href="vendor/css/rtl/appwork.css">
+  <link rel="stylesheet" href="vendor/css/rtl/theme-corporate.css">
+  <link rel="stylesheet" href="vendor/css/rtl/uikit.css">
+  <link rel="stylesheet" href="vendor/libs/select2/select2.css">
+  <link rel="stylesheet" href="vendor/libs/minicolors/minicolors.css">
+  <link rel="stylesheet" href="vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css">
+
+  <link rel="stylesheet" href="vendor/libs/toastr/toastr.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="vendor/css/pages/chat.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.1.0/ol.css">
+  <link rel="stylesheet" href="css/home.css">
+  <script th:inline="javascript">
+    window.App = {};
+    window.App.ImagesUrl = /*[[${imagesUrl}]]*/ null;
+  </script>
+  <script src="https://unpkg.com/shpjs@latest/dist/shp.js"></script>
+</head>
+
+<body>
+  <div class="layout-wrapper layout-2">
+    <div class="layout-inner">
+      <div class="layout-container">
+        <div class="layout-content">
+          <div class="container-fluid d-flex align-items-stretch flex-grow-1 p-0">
+            <div class="chat-wrapper">
+              <div class="card flex-grow-1 position-relative overflow-hidden">
+                <div class="row no-gutters h-100">
+                  <div class="chat-sidebox col py-0">
+                    <div class="flex-grow-0 px-3">
+                      <div class="media align-items-center">
+                        <div class="media-body">
+                          <div class="search-btn-input-container my-3">
+                            <input id="searchControl" type="text"
+                              class="form-control search-btn-form-control chat-search" placeholder="Buscar..."
+                              autocomplete="off">
+                            <button id="cleanSearchBtn" type="button" class="close search-btn-close"
+                              data-dismiss="modal" aria-label="Close">×</button>
+                          </div>
+                        </div>
+                        <a href="javascript:void(0)"
+                          class="chat-sidebox-toggler d-lg-none d-block text-muted text-large font-weight-light pl-3">&times;</a>
+                      </div>
+                      <hr class="border-light m-0">
+                    </div>
+                    <div class="flex-grow-1 position-relative">
+                      <div class="chat-contacts list-group chat-scroll">
+                        <div class="pt-3 px-3 d-flex justify-content-between">
+                          <div>
+                            <p>Mis lotes</p>
+                          </div>
+                          <div class="dropright">
+                            <a href="javascript:void(0)" class="nav-link p-0 disabled-on-edit-geometry"
+                              data-toggle="dropdown">
+                              <p>+ Nuevo lote</p>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-bottom">
+                              <a id="drawNewFieldMenu" href="javascript:void(0)" class="dropdown-item">
+                                <i class="fas fa-draw-polygon"></i>
+                                &nbsp; Dibujar en mapa</a>
+                              <a id="uploadFieldFileMenu" href="javascript:void(0)" class="dropdown-item"><i
+                                  class="far fa-file-image"></i>
+                                &nbsp; Cargar shapefile</a>
+                              <input class="d-none" type="file" name="uploadFieldFile" id="uploadFieldFile"
+                                accept=".zip">
+                            </div>
+                          </div>
+                        </div>
+                        <div id="userFieldsList" style="overflow-y: auto; overflow-x: hidden;"></div>
+                      </div>
+                    </div>
+                    <div class="flex-grow-0 px-2">
+                      <hr class="my-1">
+                      <ul class="list-unstyled my-2">
+                        <li class="dropright">
+                          <div class="d-inline-flex align-items-center align-middle w-100 px-2 py-1 mb-1 menu-item"
+                            data-toggle="dropdown" aria-expanded="true" data-boundary="viewport">
+                            <img th:src="${principal.avatar != null ? principal.avatar : '/img/profile-img.png'}" alt=""
+                              class="d-block ui-w-40 rounded-circle">
+                            <span class="px-1 flex-grow-1 text-truncate principal-name">[[${principal.name}]]</span>
+                            <i class="fas fa-angle-right d-block"></i>
+                          </div>
+                          <div class="dropdown-menu dropdown-menu-right">
+                            <a th:href="@{/settings}" class="dropdown-item">
+                              <i class="fas fa-user-cog"></i> &nbsp; Configuración</a>
+                            <div class="dropdown-divider"></div>
+                            <form action="#" th:action="@{/logout}" method="post">
+                              <button type="submit" class="dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i> &nbsp; Cerrar sesión
+                              </button>
+                            </form>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="d-flex col flex-column">
+                    <div class="flex-grow-1 position-relative">
+                      <div class="w-100 h-100">
+                        <div id="map">
+                        </div>
+                        <div id="tooltip" class="ol-popup">
+                        </div>
+
+                        <div id="indicesListContainer" class="mb-3"
+                          style="position:absolute; top: 15px; left: 15px; z-index: 1; display: none;">
+                          <div data-toggle="dropdown" aria-expanded="true">
+                            <div class="rounded-pill text-center text-white px-4 py-2 d-flex menu-btn">
+                              <h6 id="selectedIndiceBtn" indice="" class="my-0 p-0" style="line-height: 1;">Ver Índice
+                              </h6>
+                            </div>
+                          </div>
+                          <div class="dropdown-menu">
+                            <a href="javascript:void(0)" class="dropdown-item indice-menu-item"
+                              th:attr="indice=${indice.id},indice-name=${indice.name}" th:each="indice : ${indices}">
+                              <i class="ion ion-md-checkmark mr-1" style="display:none;"></i>
+                              <span>[[${indice.name}]]</span>
+                            </a>
+                          </div>
+                        </div>
+
+                        <div id="calendarImagesContainer" class="mb-3"
+                          style="position:absolute; top: 15px; right: 15px; z-index: 1; display: none;">
+                          <div class="rounded p-2">
+                            <div id="calendarImages" class="rounded bg-white"></div>
+                          </div>
+                        </div>
+
+                        <div id="mapTools" class="mr-3"
+                          style="position: fixed; top: 50%; right: 0; transform: translateY(-50%);">
+                          <div class="bg-white rounded border text-white d-flex flex-column" style="gap: 0;">
+                            <button id="zoomInBtn" type="button" title="Acercar"
+                              class="btn btn-sm icon-btn btn-outline-success map-tool-item rounded-top">
+                              <span class="fas fa-plus"></span>
+                            </button>
+                            <button id="zoomOutBtn" type="button" title="Alejar"
+                              class="btn btn-sm icon-btn btn-outline-success map-tool-item">
+                              <span class="fas fa-minus"></span>
+                            </button>
+                            <button id="locationBtn" type="button" title="Mi ubicación"
+                              class="btn btn-sm icon-btn btn-outline-success map-tool-item">
+                              <span class="ion ion-md-locate"></span>
+                            </button>
+                            <button id="measureBtn" type="button" measure="LineString" title="Medir longitud"
+                              class="btn btn-sm icon-btn btn-outline-success map-tool-item">
+                              <span class="fas fa-ruler-horizontal"></span>
+                            </button>
+                            <button id="measureAreaBtn" type="button" measure="Polygon" title="Medir área"
+                              class="btn btn-sm icon-btn btn-outline-success map-tool-item rounded-bottom">
+                              <span class="fas fa-draw-polygon"></span>
+                            </button>
+                          </div>
+                          <div id="measureTypes" style="opacity: 0;">
+                            <div class="bg-white rounded border text-white d-flex flex-column mt-3" style="gap: 0;">
+                              <button id="measureTypeMeters" type="button"
+                                class="btn btn-sm icon-btn btn-outline-success map-tool-item rounded-top active">
+                                m
+                              </button>
+                              <button id="measureTypeKilometers" type="button"
+                                class="btn btn-sm icon-btn btn-outline-success map-tool-item rounded-bottom">
+                                km
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div id="editFieldGeometryTools" class="mb-3"
+                          style="position:absolute; bottom: 5px; left: 50%; transform: translateX(-50%); z-index: 1; display: none;">
+                          <div class="rounded bg-dark text-center text-white d-flex flex-row p-2">
+                            <button id="cancelFieldGeometry" class="btn rounded btn-secondary px-5">Cancelar</button>
+                            <button id="saveFieldGeometry" class="btn rounded btn-success px-5">Guardar</button>
+                          </div>
+                        </div>
+
+                        <div id="legendContainer" class="mb-3"
+                          style="position:absolute; bottom: 0px; left: 15px; z-index: 1;display: none;">
+                          <div class="rounded bg-dark text-center text-white d-flex p-2 align-items-center">
+                            <div class="d-flex flex-column">
+                              <div id="legendTitleBar" class="d-flex flex-row justify-content-between"
+                                style="cursor: pointer;">
+                                <h5 class="m-0">Leyenda</h5>
+                                <i class="fas fa-angle-double-down d-block"></i>
+                              </div>
+                              <div id="legendBody">
+                                <hr class="m-0 mb-1 bg-white opacity-25">
+                                <div class="text-left mx-2">
+                                  <h5 id="legendIndicenName" class="m-0 my-2">NDVI</h5>
+                                  <div class="d-flex">
+                                    <div class="d-flex flex-column flex-grow-1 align-items-center" style="gap: 0;">
+                                      <span id="legendIndiceMax">...</span>
+                                      <div class="flex-grow-1 indice-legend-colors"></div>
+                                      <span id="legendIndiceMin">...</span>
+                                    </div>
+                                    <table class="ml-3 indice-statistics-table font-weight-light">
+                                      <tr>
+                                        <td><span>Máximo:</span>&nbsp;</td>
+                                        <td><span id="legendStatisticsMax">...</span></td>
+                                      </tr>
+                                      <tr>
+                                        <td><span>Media:</span>&nbsp;</td>
+                                        <td><span id="legendStatisticsMean">...</span></td>
+                                      </tr>
+                                      <tr>
+                                        <td><span>Mediana:</span>&nbsp;</td>
+                                        <td><span id="legendStatisticsMedian">...</span></td>
+                                      </tr>
+                                      <tr>
+                                        <td><span>Mínimo:</span>&nbsp;</td>
+                                        <td><span id="legendStatisticsMin">...</span></td>
+                                      </tr>
+                                    </table>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div id="loadingContainer" class="mb-3"
+                          style="position:absolute; bottom: 0px; left: 50%; transform: translateX(-50%); z-index: 1; display: none;">
+                          <div class="rounded bg-dark text-center text-white d-flex flex-row p-2 align-items-center">
+                            <h5 class="m-0 font-weight-light">Procesando</h5>
+                            <span class="d-flex align-items-center">
+                              <div class="spinner-grow spinner-grow-xs text-primary" role="status">
+                                <span class="sr-only ">Loading...</span>
+                              </div>
+                              <div class="spinner-grow spinner-grow-xs text-secondary" role="status">
+                                <span class="sr-only">Loading...</span>
+                              </div>
+                              <div class="spinner-grow spinner-grow-xs text-success" role="status">
+                                <span class="sr-only">Loading...</span>
+                              </div>
+                            </span>
+                          </div>
+                        </div>
+
+                        <div id="dayWeatherContainer" class="mb-3"
+                          style="position:absolute; bottom: 0px; right: 15px; z-index: 1; cursor: pointer; display:none;">
+                          <div class="rounded bg-dark text-white p-2 align-items-center">
+                            <div class="mb-2" style="width: 100px;">
+                              <h6 class="m-0 p-0 text-truncate font-weight-light">Dolores Hidalgo Cunaasasdasd sd s d
+                              </h6>
+                              <p class="m-0 text-truncate small font-weight-light">México</p>
+                            </div>
+                            <div class="text-center d-flex justify-content-center align-items-center" style="gap: 0;">
+                              <div class="fas fa-sun text-xlarge text-warning mr-2 font-weight-light"></div>
+                              <h3 class="m-0 font-weight-light">30 <sup>o</sup>C</h3>
+                            </div>
+                            <div class="text-center">
+                              <p class="m-0 mt-2 font-weight-light">Lun. 10</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="saveFieldModal" data-backdrop="static">
+    <div class="modal-dialog">
+      <form id="fieldForm" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Guardar lote</h5>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group col">
+              <label class="form-label">Nombre del lote *</label>
+              <input id="fieldName" type="text" class="form-control" maxlength="80"
+                placeholder="Escribe el nombre del lote" autocomplete="off" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col">
+              <label class="form-label">Cultivo</label>
+              <select id="fieldCrop" class="form-control" style="width: 100%" data-allow-clear="true"
+                data-placeholder="Selecciona un cultivo">
+                <option></option>
+                <option th:each="crop : ${crops}" th:value="${crop.id}" th:text="${crop.name}">
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row mb-2">
+            <div class="form-group col">
+              <label class="form-label">Fecha de siembra</label>
+              <input id="fieldPlantingDate" type="text" class="form-control" placeholder="dd/MM/yyyy"
+                autocomplete="off">
+            </div>
+            <div class="form-group col">
+              <label class="form-label">Fecha de cosecha</label>
+              <input id="fieldHarvestDate" type="text" class="form-control" placeholder="dd/MM/yyyy" autocomplete="off">
+            </div>
+          </div>
+          <hr class="mb-0">
+          <div class="text-center mb-3" style="margin-top: -11px;">
+            <b class="bg-white px-2">Borde del lote</b>
+          </div>
+          <div class="form-row">
+            <div class="form-group col">
+              <label class="form-label" for="fieldBorderColor">Color de borde *</label>
+              <input id="fieldBorderColor" type="text" class="form-control" value="#000000" autocomplete="off" required>
+            </div>
+            <div class="form-group col">
+              <label class="form-label">Ancho de borde *</label>
+              <input id="fieldBorderSize" type="number" class="form-control" min="1" max="10" autocomplete="off"
+                required>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="fmsCancelBtn" type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+          <button id="fmsSaveBtn" type="submit" class="btn btn-success">
+            Guardar lote
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal fade" id="deleteFieldModal" data-backdrop="static">
+    <div class="modal-dialog">
+      <form id="deleteFieldForm" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Eliminar lote</h5>
+        </div>
+        <div class="modal-body py-4">
+          <div class="d-flex align-items-center">
+            <div class="far fa-trash-alt display-3 text-danger"></div>
+            <div class="ml-3">
+              <div class="text-large">¿Está seguro de eliminar el lote?</div>
+              <div class="text-big ml-1"><b id="deleteFieldName"></b></div>
+              <div class="text-danger ml-1 mt-2">¡Esta acción no puede ser revertida!</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="fmdCancelBtn" type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+          <button id="fmdDeleteBtn" type="submit" class="btn btn-danger">
+            Eliminar lote
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal fade" id="weatherModal" data-backdrop="static">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            El tiempo
+          </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="card">
+            <div class="row no-gutters row-bordered">
+              <div class="col-12">
+                <h5 class="card-header with-elements border-0">
+                  <span class="card-header-title"><i class="ion ion-md-stats text-primary"></i>&nbsp; Clima</span>
+                  <div class="card-header-elements ml-auto">
+                    <div id="weatherVariablesContainer" class="btn-group btn-group-toggle">
+                      <label class="btn btn-success">
+                        <input type="radio" name="btn-radio" class="weatherVariable" chart="temperatureChart">
+                        Temperatura
+                      </label>
+                      <label class="btn btn-default">
+                        <input type="radio" name="btn-radio" class="weatherVariable" chart="precipitationChart">
+                        Precipitación
+                      </label>
+                      <label class="btn btn-default">
+                        <input type="radio" name="btn-radio" class="weatherVariable" chart="humidityChart"> Humedad
+                      </label>
+                      <label class="btn btn-default">
+                        <input type="radio" name="btn-radio" class="weatherVariable" chart="windChart"> Viento
+                      </label>
+                    </div>
+                  </div>
+                </h5>
+              </div>
+            </div>
+            <hr class="border-light p-0 m-0">
+            <div class="row no-gutters row-bordered">
+              <div id="chartsContainer" class="col-12 px-1 pt-4 pb-0">
+                <div id="temperatureChart" style="height: 300px;"></div>
+                <div id="humidityChart" style="height: 300px;display: none;"></div>
+                <div id="precipitationChart" style="height: 300px;display: none;"></div>
+                <div id="windChart" style="height: 300px;display: none;"></div>
+                <!-- <div id="weatherChartContainer" style="height: 300px;"></div> -->
+              </div>
+            </div>
+            <hr class="border-light m-0 p-0">
+            <div class="row no-gutters row-bordered">
+              <div class="col-12">
+                <h5 class="card-header with-elements border-0">
+                  <span class="card-header-title"><i class="ion ion-md-stats text-primary"></i>&nbsp; Pronóstico del
+                    tiempo</span>
+                </h5>
+              </div>
+            </div>
+            <hr class="border-light p-0 m-0">
+            <div class="row no-gutters row-bordered">
+              <div class="col-12 px-1 pt-2 pb-0">
+                <table class="table card-table">
+                  <tbody>
+                    <tr>
+                      <td>
+                        <div class="card card-body">
+                          <h6 class="m-0">Hoy</h6>
+                          <p>17 Jun</p>
+                          <div class="text-center d-flex align-items-center" style="gap: 0;">
+                            <div class="fas fa-sun text-large text-warning mr-2 font-weight-light"></div>
+                            <h5 class="m-0 font-weight-bold">30 <sup>o</sup>C</h5>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="fas fa-cloud-rain mr-2 mb-1"></div>
+                            <p class="m-0">0 mm</p>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="oi oi-droplet mr-2 mb-1 font-weight-light"></div>
+                            <p class="m-0">11%</p>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="fas fa-wind mr-2 mb-1"></div>
+                            <p class="m-0">9km/h</p>
+                            <div class="ion ion-ios-arrow-round-up ml-2 mb-1"></div>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="ion ion-ios-leaf mr-2 mb-1"></div>
+                            <p class="m-0">-4 <sup>o</sup>C</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td><div class="card card-body">
+                          <h6 class="m-0">Martes</h6>
+                          <p>18 Jun</p>
+                          <div class="text-center d-flex align-items-center" style="gap: 0;">
+                            <div class="fas fa-sun text-large text-warning mr-2 font-weight-light"></div>
+                            <h5 class="m-0 font-weight-bold">25 <sup>o</sup>C</h5>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="fas fa-cloud-rain mr-2 mb-1"></div>
+                            <p class="m-0">0 mm</p>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="oi oi-droplet mr-2 mb-1 font-weight-light"></div>
+                            <p class="m-0">11%</p>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="fas fa-wind mr-2 mb-1"></div>
+                            <p class="m-0">9km/h</p>
+                            <div class="ion ion-ios-arrow-round-up ml-2 mb-1"></div>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="ion ion-ios-leaf mr-2 mb-1"></div>
+                            <p class="m-0">-4 <sup>o</sup>C</p>
+                          </div>
+                        </div></td>
+                      <td><div class="card card-body">
+                          <h6 class="m-0">Miercoles</h6>
+                          <p>19 Jun</p>
+                          <div class="text-center d-flex align-items-center" style="gap: 0;">
+                            <div class="fas fa-sun text-large text-warning mr-2 font-weight-light"></div>
+                            <h5 class="m-0 font-weight-bold">22 <sup>o</sup>C</h5>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="fas fa-cloud-rain mr-2 mb-1"></div>
+                            <p class="m-0">0 mm</p>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="oi oi-droplet mr-2 mb-1 font-weight-light"></div>
+                            <p class="m-0">11%</p>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="fas fa-wind mr-2 mb-1"></div>
+                            <p class="m-0">9km/h</p>
+                            <div class="ion ion-ios-arrow-round-up ml-2 mb-1"></div>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="ion ion-ios-leaf mr-2 mb-1"></div>
+                            <p class="m-0">-4 <sup>o</sup>C</p>
+                          </div>
+                        </div></td>
+                      <td><div class="card card-body">
+                          <h6 class="m-0">Jueves</h6>
+                          <p>20 Jun</p>
+                          <div class="text-center d-flex align-items-center" style="gap: 0;">
+                            <div class="fas fa-sun text-large text-warning mr-2 font-weight-light"></div>
+                            <h5 class="m-0 font-weight-bold">22 <sup>o</sup>C</h5>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="fas fa-cloud-rain mr-2 mb-1"></div>
+                            <p class="m-0">0 mm</p>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="oi oi-droplet mr-2 mb-1 font-weight-light"></div>
+                            <p class="m-0">11%</p>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="fas fa-wind mr-2 mb-1"></div>
+                            <p class="m-0">9km/h</p>
+                            <div class="ion ion-ios-arrow-round-up ml-2 mb-1"></div>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="ion ion-ios-leaf mr-2 mb-1"></div>
+                            <p class="m-0">-4 <sup>o</sup>C</p>
+                          </div>
+                        </div></td>
+                      <td><div class="card card-body">
+                          <h6 class="m-0">Viernes</h6>
+                          <p>21 Jun</p>
+                          <div class="text-center d-flex align-items-center" style="gap: 0;">
+                            <div class="fas fa-sun text-large text-warning mr-2 font-weight-light"></div>
+                            <h5 class="m-0 font-weight-bold">19 <sup>o</sup>C</h5>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="fas fa-cloud-rain mr-2 mb-1"></div>
+                            <p class="m-0">0 mm</p>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="oi oi-droplet mr-2 mb-1 font-weight-light"></div>
+                            <p class="m-0">11%</p>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="fas fa-wind mr-2 mb-1"></div>
+                            <p class="m-0">9km/h</p>
+                            <div class="ion ion-ios-arrow-round-up ml-2 mb-1"></div>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="ion ion-ios-leaf mr-2 mb-1"></div>
+                            <p class="m-0">-4 <sup>o</sup>C</p>
+                          </div>
+                        </div></td>
+                      <td><div class="card card-body">
+                          <h6 class="m-0">Sabado</h6>
+                          <p>22 Jun</p>
+                          <div class="text-center d-flex align-items-center" style="gap: 0;">
+                            <div class="fas fa-sun text-large text-warning mr-2 font-weight-light"></div>
+                            <h5 class="m-0 font-weight-bold">19 <sup>o</sup>C</h5>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="fas fa-cloud-rain mr-2 mb-1"></div>
+                            <p class="m-0">0 mm</p>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="oi oi-droplet mr-2 mb-1 font-weight-light"></div>
+                            <p class="m-0">11%</p>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="fas fa-wind mr-2 mb-1"></div>
+                            <p class="m-0">9km/h</p>
+                            <div class="ion ion-ios-arrow-round-up ml-2 mb-1"></div>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="ion ion-ios-leaf mr-2 mb-1"></div>
+                            <p class="m-0">-4 <sup>o</sup>C</p>
+                          </div>
+                        </div></td>
+                      <td><div class="card card-body">
+                          <h6 class="m-0">Domingo</h6>
+                          <p>23 Jun</p>
+                          <div class="text-center d-flex align-items-center" style="gap: 0;">
+                            <div class="fas fa-sun text-large text-warning mr-2 font-weight-light"></div>
+                            <h5 class="m-0 font-weight-bold">22 <sup>o</sup>C</h5>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="fas fa-cloud-rain mr-2 mb-1"></div>
+                            <p class="m-0">0 mm</p>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="oi oi-droplet mr-2 mb-1 font-weight-light"></div>
+                            <p class="m-0">11%</p>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="fas fa-wind mr-2 mb-1"></div>
+                            <p class="m-0">9km/h</p>
+                            <div class="ion ion-ios-arrow-round-up ml-2 mb-1"></div>
+                          </div>
+                          <div class="text-center d-flex align-items-center mt-2" style="gap: 0;">
+                            <div class="ion ion-ios-leaf mr-2 mb-1"></div>
+                            <p class="m-0">-4 <sup>o</sup>C</p>
+                          </div>
+                        </div></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ol@v9.2.2/dist/ol.js"></script>
+  <script src="https://viglino.github.io/ol-ext/dist/ol-ext.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/geotiff@2.1.3/dist-browser/geotiff.min.js"></script>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/windbarb.js"></script>
+
+  <script src="vendor/libs/popper/popper.js"></script>
+  <script src="vendor/js/bootstrap.js"></script>
+  <script src="vendor/libs/select2/select2.js"></script>
+  <script src="vendor/libs/select2/select2.js"></script>
+  <script src="vendor/libs/minicolors/minicolors.js"></script>
+  <script src="vendor/libs/toastr/toastr.js"></script>
+  <script src="vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js"></script>
+
+  <script src="js/common.js"></script>
+  <script src="js/home.js"></script>
+  <script src="js/measure.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/fields.js"></script>
+  <script src="js/indices.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/calendar.js"></script>
+  <script src="js/weather.js"></script>
+</body>
+
+</html>

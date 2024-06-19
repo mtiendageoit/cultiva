@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<html lang="es-MX" class="light-style" xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{settings/layout}">
+
+<head>
+  <title>Cultiva :: Cuenta</title>
+</head>
+
+<body>
+  <div layout:fragment="main-content" class="d-flex col flex-column">
+    <div class="flex-grow-1 position-relative">
+      <div class="w-75 h-100">
+        <div class="container-fluid flex-grow-1">
+          <h4 class="font-weight-bold py-3 mb-4">
+            Cuenta
+          </h4>
+          <div class="card overflow-hidden">
+            <div class="row no-gutters row-bordered row-border-light">
+              <div class="col-md-3 pt-0">
+                <div class="list-group list-group-flush account-settings-links">
+                  <a class="list-group-item list-group-item-action active" data-toggle="list"
+                    href="#account-change-password">Cambiar contraseña</a>
+                  <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-delete">Eliminar
+                    cuenta</a>
+                </div>
+              </div>
+              <div class="col-md-9">
+                <div class="tab-content">
+                  <div class="tab-pane active" id="account-change-password">
+                    <div class="card-body pb-2">
+                      <form id="changePasswordForm" autocomplete="off">
+                        <div class="form-group">
+                          <label class="form-label" for="currentPassword">Contraseña actual</label>
+                          <input id="currentPassword" type="password" class="form-control" autocomplete="off" required>
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label" for="newPassword">Nueva contraseña</label>
+                          <input id="newPassword" type="password" class="form-control" autocomplete="off" required>
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">Confirmar nueva contraseña</label>
+                          <input id="matchPassword" type="password" class="form-control" autocomplete="off" required>
+                        </div>
+                        <div class="my-3 d-flex justify-content-between">
+                          <button id="changePassword" type="submit" class="btn btn-success mr-2">Actualizar
+                            contraseña</button>
+                          <a th:href="@{/password-reset}" class="d-block">Olvidé mi contraseña</a>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                  <div class="tab-pane fade" id="account-delete">
+                    <div class="card-body pb-2">
+                      <div class="my-3">
+                        <h5 class="text-danger">Al eliminar su cuenta, todos los datos serán eliminados. Esta acción no
+                          puede ser revertida.
+                        </h5>
+                        <button id="showDeleteAccountModalBtn" type="input" class="btn btn-danger">Eliminar
+                          cuenta</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div layout:fragment="outer-content">
+    <div class="modal fade" id="deleteAccountModal" data-backdrop="static">
+      <div class="modal-dialog">
+        <form id="deleteAccountForm" class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Eliminar cuenta</h5>
+          </div>
+          <div class="modal-body py-4">
+            <div class="d-flex align-items-center align-middle">
+              <div class="far fa-trash-alt display-3 text-danger"></div>
+              <div class="ml-3">
+                <div class="text-big">Si elimina su cuenta, todos los datos relacionados serán borrados definitivamente.
+                </div>
+                <div class="text-danger ml-1 mt-1 mb-3 font-weight-bold">¡Esta acción no puede ser revertida!</div>
+                <div class="form-group">
+                  <label class="form-label" for="deletePhrase">Escriba la palabra <span id="deletePhraseLabel"
+                      class="text-danger font-weight-bold">"Eliminar"</span> para poder eliminar su
+                    cuenta</label>
+                  <input id="deletePhraseTxt" type="text" class="form-control" autocomplete="off" maxlength="50"
+                    required>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+            <button id="deleteAccountBtn" type="submit" class="btn btn-danger" disabled>
+              Eliminar cuenta
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal fade" id="deleteAccountSuccessModal" data-backdrop="static">
+      <div class="modal-dialog">
+        <form class="modal-content" th:action="@{/logout}">
+          <div class="modal-header">
+            <h5 class="modal-title">Cuenta eliminada</h5>
+          </div>
+          <div class="modal-body py-4">
+            <div class="d-flex align-items-center mb-2">
+              <div class="display-3 text-danger">
+                <i class="far fa-sad-tear d-block"></i>
+              </div>
+              <div class="ml-3">
+                <div class="text-big">Su cuenta se ha eliminado definitivamente.
+                </div>
+                <div class="text-danger ml-1 mt-1 mb-3 font-weight-bold">¡Lamentamos que se vaya, gracias por utilizar
+                  nuestros productos!</div>
+                <h6>Saliendo de la cuenta en: <span id="deleteAccountRedirectTime"></span> segundos.</h6>
+              </div>
+            </div>
+            <div class="text-center">
+              <button class="form-control btn-danger">Aceptar</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+
+  <th:block layout:fragment="scripts">
+    <script th:src="@{/settings/account.js}"></script>
+  </th:block>
+</body>
+
+</html>

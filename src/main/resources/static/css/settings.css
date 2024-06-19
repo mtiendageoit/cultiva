@@ -1,0 +1,22 @@
+.menu-item {
+  cursor: pointer;
+  border-radius: .5rem;
+}
+
+.menu-item:hover {
+  background-color: #f2f2f7 !important;
+}
+
+.menu-item.active {
+  font-weight: 500;
+  background-color: #f2f2f7;
+}
+
+html:not(.dark-style) .account-settings-links .list-group-item.active {
+  background: #f2f2f7 !important;
+}
+
+.dropdown-item:not(.disabled).active,.dropdown-item:not(.disabled):active {
+  background-color: #02BC77 !important;
+  color: white;
+}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+  <div th:fragment="sidebar" class="chat-sidebox col">
+    <div class="flex-grow-0  text-white">
+      <div class="d-inline-flex align-items-center justify-content-center w-100 bg-success py-3">
+        <a th:href="@{/}" class="text-white d-inline-flex">
+          <i class="fas fa-seedling text-large"></i>
+          <h4 class="ml-1 my-0">Cultiva</h4>
+        </a>
+      </div>
+    </div>
+    <div>
+      <hr class="border-light mb-2 mt-0">
+    </div>
+    <div class="flex-grow-1 position-relative">
+      <div class="chat-contacts list-group chat-scroll px-2">
+        <ul class="list-unstyled">
+          <li>
+            <a th:href="@{/settings/profile}"
+              class="d-inline-flex align-items-center align-middle w-100 px-2 py-2 mb-1 text-dark menu-item"
+              th:classappend="${#strings.equals(currentUrl,'/settings/profile')} ? active : ''">
+              <span class="fas fa-user-alt mr-1"></span>
+              <span class="px-1 flex-grow-1 text-truncate">Mi perfil</span>
+            </a>
+          </li>
+          <li>
+            <a th:href="@{/settings/account}"
+              class="d-inline-flex align-items-center align-middle w-100 px-2 py-2 mb-1 text-dark menu-item"
+              th:classappend="${#strings.equals(currentUrl,'/settings/account')} ? active : ''">
+              <span class="fas fa-cog mr-1"></span>
+              <span class="text-dark px-1 flex-grow-1 text-truncate">Cuenta</span>
+            </a>
+          </li>
+          <!-- <li>
+            <a th:href="@{/settings/billing}"
+              class="d-inline-flex align-items-center align-middle w-100 px-2 py-2 mb-1 text-dark menu-item"
+              th:classappend="${#strings.equals(currentUrl,'/settings/billing')} ? active : ''">
+              <span class="far fa-credit-card mr-1"></span>
+              <span class="text-dark px-1 flex-grow-1 text-truncate">Plan y facturación</span>
+            </a>
+          </li> -->
+        </ul>
+      </div>
+    </div>
+    <div class="flex-grow-0 px-2">
+      <hr class="my-1">
+      <ul class="list-unstyled my-2">
+        <li class="dropright">
+          <div class="d-inline-flex align-items-center align-middle w-100 px-2 py-1 mb-1 menu-item"
+            data-toggle="dropdown" aria-expanded="true" data-boundary="viewport">
+            <img th:src="${principal.avatar != null ? principal.avatar : '/img/profile-img.png'}" alt="" class="userAvatarImg d-block ui-w-40 rounded-circle">
+            <span class="pl-1 pr-3 flex-grow-1 text-truncate principal-name">[[${principal.name}]]</span>
+            <i class="fas fa-angle-right d-block"></i>
+          </div>
+          <div class="dropdown-menu dropdown-menu-right">
+            <form action="#" th:action="@{/logout}" method="post">
+              <button type="submit" class="dropdown-item">
+                <i class="fas fa-sign-out-alt"></i> &nbsp; Cerrar sesión
+              </button>
+            </form>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</body>
+
+</html>

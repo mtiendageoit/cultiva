@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+  <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE"></title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="IE=edge,chrome=1">
+  <meta name="description" content="">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i,900" rel="stylesheet">
+
+  <!-- Icon fonts -->
+  <link rel="stylesheet" th:href="@{/vendor/fonts/fontawesome.css}">
+  <!-- <link rel="stylesheet" th:href="@{/vendor/fonts/ionicons.css"> }-->
+
+  <!-- Core stylesheets -->
+  <link rel="stylesheet" th:href="@{/vendor/css/rtl/bootstrap.css}">
+  <link rel="stylesheet" th:href="@{/vendor/css/rtl/appwork.css}">
+  <link rel="stylesheet" th:href="@{/vendor/css/rtl/theme-corporate.css}">
+  <link rel="stylesheet" th:href="@{/vendor/css/rtl/uikit.css}">
+
+  <link rel="stylesheet" th:href="@{/vendor/libs/toastr/toastr.css}">
+
+  <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.7.1.min.js"></script>
+
+  <link rel="stylesheet" th:href="@{/vendor/css/pages/account.css}">
+  <link rel="stylesheet" th:href="@{/vendor/css/pages/chat.css}">
+  <link rel="stylesheet" th:href="@{/css/settings.css}">
+</head>
+
+<body class="bg-success">
+  <div class="layout-wrapper layout-2">
+    <div class="layout-inner">
+      <div class="layout-container">
+        <div class="layout-content">
+          <div class="container-fluid d-flex align-items-stretch flex-grow-1 p-0">
+            <div class="chat-wrapper ">
+              <div class="card flex-grow-1 position-relative overflow-hidden border-0">
+                <div class="row no-gutters h-100">
+                  <div th:replace="~{settings/sidebar :: sidebar}"></div>
+                  <div layout:fragment="main-content">
+                    <h1>main-content</h1>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <th:block layout:fragment="outer-content">
+  </th:block>
+
+  <script th:src="@{/vendor/libs/popper/popper.js}"></script>
+  <script th:src="@{/vendor/js/bootstrap.js}"></script>
+  <script th:src="@{/vendor/libs/toastr/toastr.js}"></script>
+  <script th:src="@{/js/common.js}"></script>
+
+  <th:block layout:fragment="scripts">
+  </th:block>
+
+</body>
+
+</html>
