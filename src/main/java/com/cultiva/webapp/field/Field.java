@@ -2,8 +2,7 @@ package com.cultiva.webapp.field;
 
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
 
 import jakarta.persistence.*;
 import lombok.*;

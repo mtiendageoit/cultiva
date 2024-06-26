@@ -118,8 +118,8 @@ body,
   padding: 5px;
   border-radius: 6px;
   bottom: 9px;
-  left: -50px;
-  width: 85px;
+  left: -55px;
+  width: 90px;
 }
 
 .ol-popup:after {
@@ -135,7 +135,7 @@ body,
 .ol-popup:after {
   border-top-color: rgba(0, 0, 0, .7);
   border-width: 8px;
-  left: 32px;
+  left: 37px;
 }
 
 .indice-statistics-table {

@@ -1,12 +1,10 @@
 const Indices = ((element) => {
   const INDICES = {
-    NDVI: { id: 1, name: 'NDVI', min: '-1.0', max: '1.0', colors: ['#FF0000', '#FFFFFF', '#008000'] },
-    EVI: { id: 2, name: 'EVI', min: '0.0', max: '12.0', colors: ['#0000FF', '#FFFFFF', '#008000'] },
-    AVI: { id: 3, name: 'AVI', min: '0.0', max: '1.0', colors: ['#0000FF', '#FFFFFF', '#008000'] },
-    SAVI: { id: 4, name: 'SAVI', min: '-1.0', max: '1.0', colors: ['#A52A2A', '#FFFFFF', '#008000'] },
-    MSI: { id: 5, name: 'MSI', min: '0.0', max: '2.0', colors: ['#A52A2A', '#FFFFFF', '#0000FF'] },
-    VCI: { id: 6, name: 'VCI', min: '0.0', max: '100.0', colors: ['#FF0000', '#FFFF00', '#008000'] },
-    VHI: { id: 7, name: 'VHI', min: '0.0', max: '1.0', colors: ['#A52A2A', '#FFFF00', '#008000'] }
+    NDVI: { id: 1, name: 'NDVI', min: '-1.0', max: '1.0', colors: ['#A52A2A', '#FFFF00', '#008000'] },
+    MSAVI: { id: 2, name: 'MSAVI', min: '-1.0', max: '1.0', colors: ['#A10024', '#F3FCAB', '#0C7E43'] },
+    RECI: { id: 3, name: 'RECI', min: '0.0', max: '10.0', colors: ['#A92D2A', '#FFFDC1', '#367C46'] },
+    SIPI: { id: 4, name: 'SIPI', min: '0.0', max: '2.0', colors: ['#009392', '#D0587E', '#F1EAC8'] },
+    NDWI: { id: 5, name: 'NDWI', min: '-1.0', max: '1.0', colors: ['#008000', '#FFFFFF', '#0000CC'] }
   }
   const indicesBtns = $('.indice-menu-item');
   const selectedIndiceBtn = $('#selectedIndiceBtn');
@@ -21,98 +19,74 @@ const Indices = ((element) => {
   const legendStatisticsMean = $('#legendStatisticsMean');
   const legendStatisticsMedian = $('#legendStatisticsMedian');
   const legendStatisticsMin = $('#legendStatisticsMin');
+  const legendStatisticsStdDev = $('#legendStatisticsStdDev');
+  const legendStatisticsVariance = $('#legendStatisticsVariance');
+  const legendStatisticsP25 = $('#legendStatisticsP25');
+  const legendStatisticsP50 = $('#legendStatisticsP50');
+  const legendStatisticsP75 = $('#legendStatisticsP75');
 
   element.getSelectedIndiceStyle = () => {
     const indice = element.selectedIndice();
     if (INDICES.NDVI == indice) return ndviStyle();
-    if (INDICES.EVI == indice) return eviStyle();
-    if (INDICES.AVI == indice) return aviStyle();
-    if (INDICES.SAVI == indice) return saviStyle();
-    if (INDICES.MSI == indice) return msiStyle();
-    if (INDICES.VCI == indice) return vciStyle();
-    if (INDICES.VHI == indice) return vhiStyle();
+    if (INDICES.MSAVI == indice) return msaviStyle();
+    if (INDICES.RECI == indice) return reciStyle();
+    if (INDICES.SIPI == indice) return sipiStyle();
+    if (INDICES.NDWI == indice) return ndwiStyle();
   };
 
-  function vhiStyle() {
+  function ndwiStyle() {
     return {
       color: [
         'interpolate',
         ['linear'],
         ['band', 1],
         -9999, 'Transparent',
-        0, '#A52A2A',
-        0.5, '#FFFF00',
-        1, '#008000',
+        -1.0, '#008000',
+        0.0, '#FFFFFF',
+        1.0, '#0000CC',
       ],
     };
   }
 
-  function vciStyle() {
+  function sipiStyle() {
     return {
       color: [
         'interpolate',
         ['linear'],
         ['band', 1],
         -9999, 'Transparent',
-        0, '#FF0000',
-        50, '#FFFF00',
-        100, '#008000',
+        0.0, '#009392',
+        1.0, '#D0587E',
+        2.0, '#F1EAC8',
       ],
     };
   }
 
-  function msiStyle() {
+
+  function reciStyle() {
     return {
       color: [
         'interpolate',
         ['linear'],
         ['band', 1],
         -9999, 'Transparent',
-        0, '#A52A2A',
-        1, '#FFFFFF',
-        2, '#0000FF',
+        0.0, '#A92D2A',
+        5.0, '#FFFDC1',
+        10.0, '#367C46',
       ],
     };
   }
 
-  function saviStyle() {
+  function msaviStyle() {
     return {
       color: [
         'interpolate',
         ['linear'],
         ['band', 1],
         -9999, 'Transparent',
-        -1, '#A52A2A',
-        0, '#FFFFFF',
-        1, '#008000',
-      ],
-    };
-  }
-
-  function aviStyle() {
-    return {
-      color: [
-        'interpolate',
-        ['linear'],
-        ['band', 1],
-        -9999, 'Transparent',
-        0, '#0000FF',
-        0.5, '#FFFFFF',
-        1, '#008000',
-      ],
-    };
-  }
-
-  function eviStyle() {
-    return {
-      color: [
-        'interpolate',
-        ['linear'],
-        ['band', 1],
-        -9999, 'Transparent',
-        0, '#0000FF',
-        6, '#FFFFFF',
-        12, '#008000',
+        -1.0, '#A10024',
+        0, '#F3FCAB',
+        1.0, '#0C7E43',
       ],
     };
   }
@@ -124,8 +98,8 @@ const Indices = ((element) => {
         ['linear'],
         ['band', 1],
         -9999, 'Transparent',
-        -1.0, '#a52a2a',
-        0, '#ffff00',
+        -1.0, '#A52A2A',
+        0, '#FFFF00',
         1.0, '#008000',
       ],
     };
@@ -134,7 +108,7 @@ const Indices = ((element) => {
   element.showIndices = (show) => {
     if (show) {
       container.show();
-      legend.show();
+      // legend.show();
     } else {
       container.hide();
       legend.hide();
@@ -203,6 +177,12 @@ const Indices = ((element) => {
     legendStatisticsMean.text(loadingText);
     legendStatisticsMedian.text(loadingText);
     legendStatisticsMin.text(loadingText);
+    legendStatisticsStdDev.text(loadingText);
+    legendStatisticsVariance.text(loadingText);
+    legendStatisticsP25.text(loadingText);
+    legendStatisticsP50.text(loadingText);
+    legendStatisticsP75.text(loadingText);
+
   };
 
   element.showIndiceFieldStatistics = (stats) => {
@@ -210,6 +190,12 @@ const Indices = ((element) => {
     legendStatisticsMean.text(formatNumber(stats.mean));
     legendStatisticsMedian.text(formatNumber(stats.median));
     legendStatisticsMin.text(formatNumber(stats.min));
+    legendStatisticsStdDev.text(formatNumber(stats.stdDev));
+    legendStatisticsVariance.text(formatNumber(stats.variance));
+    legendStatisticsP25.text(formatNumber(stats.p25));
+    legendStatisticsP50.text(formatNumber(stats.p50));
+    legendStatisticsP75.text(formatNumber(stats.p75));
+    legend.show();
   };
 
   init();

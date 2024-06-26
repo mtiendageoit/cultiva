@@ -9,13 +9,15 @@ const CalendarImages = (function (element) {
   };
 
   element.setDates = (dates) => {
-    disabled();
     const hasDates = dates && dates.length > 0;
 
     if (hasDates) {
       currentDates = dates;
       const startDate = currentDates[currentDates.length - 1].imageDate;
       calendarImages.datepicker('setStartDate', startDate);
+
+      const endDate = currentDates[0].imageDate;
+      calendarImages.datepicker('setEndDate', endDate);
     }
 
     element.showCalendar(hasDates);
@@ -32,7 +34,6 @@ const CalendarImages = (function (element) {
 
   function init() {
     initControls();
-    disabled();
   }
 
   function initControls() {
@@ -44,38 +45,11 @@ const CalendarImages = (function (element) {
       format: 'dd/mm/yyyy',
       orientation: 'bottom right',
       container: '#calendarImagesContainer',
-      beforeShowDay: beforeShowDay
     }).on('changeDate', onChangeDate);
   }
 
   function onChangeDate(e) {
     OlMapField.getImageForSelectedField();
-  }
-
-  function beforeShowDay(date) {
-    if (currentDates) {
-      const showDate = formatDate(date);
-      const imageDate = currentDates.find(item => item.imageDate === showDate);
-
-      return {
-        enabled: imageDate ? true : false
-      }
-    }
-
-    return {
-      enabled: false
-    }
-  }
-
-  function disabled() {
-    let startDate, endDate;
-    startDate = endDate = formatDate(new Date());
-
-    calendarImages.datepicker('setStartDate', startDate);
-    calendarImages.datepicker('setEndDate', endDate);
-    calendarImages.datepicker('setDatesDisabled', startDate);
-
-    fieldImageDates = null;
   }
 
   function formatDate(date) {

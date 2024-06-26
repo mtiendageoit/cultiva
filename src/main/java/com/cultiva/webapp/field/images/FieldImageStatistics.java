@@ -7,10 +7,15 @@ import lombok.Data;
 
 @Data
 public class FieldImageStatistics {
-  private Double min;
+  private Double max;
   private Double mean;
   private Double median;
-  private Double max;
+  private Double min;
+  private Double p25;
+  private Double p50;
+  private Double p75;
+  private Double stdDev;
+  private Double variance;
 
   public String toJsonString() {
     try {

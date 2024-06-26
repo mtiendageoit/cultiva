@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -13,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cultiva.webapp.config.AppConfig;
+import com.cultiva.webapp.exception.BaseException;
 import com.cultiva.webapp.field.Field;
 import com.cultiva.webapp.field.images.*;
 import com.cultiva.webapp.indices.Indice;
@@ -27,57 +27,48 @@ public class GoogleCloudClient {
   private final AppConfig config;
   private final RestTemplate restTemplate;
 
-  public List<FieldImageDateDto> imageDates(Field field, LocalDate from, LocalDate to) {
-    List<List<Double>> coords = coordinatesFromWKT(field.getWkt());
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-
-    DatesRequest requestObject = DatesRequest.builder()
-        .coords(coords)
-        .from(DATE_FORMAT.format(from))
-        .to(DATE_FORMAT.format(to))
-        .build();
-
-    HttpEntity<DatesRequest> requestEntity = new HttpEntity<>(requestObject, headers);
-
-    String url = config.getGoogleCloudFunctionsUrl() + "/image-dates";
-    ResponseEntity<List<FieldImageDateDto>> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity,
-        new ParameterizedTypeReference<List<FieldImageDateDto>>() {
-        });
-
-    return response.getBody();
-  }
-
-  public FieldImageStatistics processIndiceImageField(Field field, String imageName, Indice indice, LocalDate imageDate) {
-    List<List<Double>> coords = coordinatesFromWKT(field.getWkt());
-
-    LocalDate to = imageDate.plusDays(1);
+  public FieldImageStatistics processIndiceImageField(String imageName, String geeImageId, Indice indice) {
 
     ImageRequest requestObject = ImageRequest.builder()
         .imageName(imageName)
-        .coords(coords)
-        .from(DATE_FORMAT.format(imageDate))
-        .to(DATE_FORMAT.format(to))
+        .geeImageId(geeImageId)
         .build();
 
     try {
       ResponseEntity<FieldImageStatistics> response = restTemplate.postForEntity(indice.getUrl(), requestObject,
-      FieldImageStatistics.class);
+          FieldImageStatistics.class);
       return response.getBody();
     } catch (Exception e) {
       e.getMessage();
+      System.err.println(e.getMessage());
     }
 
     return null;
   }
 
-  private List<List<Double>> coordinatesFromWKT(String wkt) {
-    // wkt = "POLYGON((-98.27244851220578 20.079629401530283,-98.27080004364859
-    // 20.079104413000877,-98.27294115798148 20.075482834059187,-98.27406855889127
-    // 20.075776478711887,-98.27266641322196 20.079398050869628,-98.27244851220578
-    // 20.079629401530283))";
+  public PlanetOrderResponse processPlanetOrder(Field field, LocalDate from) {
+    List<List<Double>> coords = coordinatesFromWKT(field.getWkt());
 
+    PlanetOrderRequest request = PlanetOrderRequest.builder()
+        .from(DATE_FORMAT.format(from))
+        .userId(field.getUserId())
+        .fieldId(field.getId())
+        .fieldVersion(field.getVersion())
+        .coords(coords)
+        .build();
+
+    try {
+      String url = config.getGoogleCloudFunctionsUrl();
+      ResponseEntity<PlanetOrderResponse> response = restTemplate.postForEntity(url, request,
+          PlanetOrderResponse.class);
+      return response.getBody();
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
+      throw new BaseException("order-error", e.getMessage());
+    }
+  }
+
+  private List<List<Double>> coordinatesFromWKT(String wkt) {
     String coords = wkt.replace("POLYGON((", "").replace("))", "");
     String pairsCords[] = coords.split(",");
 

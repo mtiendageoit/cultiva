@@ -4,9 +4,11 @@ import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.*;
 
-import lombok.Data;
+import lombok.*;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class FieldImageDateDto {
   private double cloudyPercentage;
 

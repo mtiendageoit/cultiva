@@ -8,8 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import com.cultiva.webapp.field.images.FieldImage;
-import com.cultiva.webapp.field.images.FieldImageDateDto;
+import com.cultiva.webapp.field.images.*;
 import com.cultiva.webapp.security.*;
 
 import jakarta.validation.Valid;
@@ -54,7 +53,7 @@ public class FieldsController {
   }
 
   @PostMapping("/{uuid}/image")
-  public FieldImage indiceImageField(@PathVariable String uuid, @RequestParam int indice,
+  public FieldImageResult indiceImageField(@PathVariable String uuid, @RequestParam int indice,
       @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate from,
       @AuthenticationPrincipal UserPrincipal principal) {
     return service.indiceImageField(uuid, indice, from, principal);

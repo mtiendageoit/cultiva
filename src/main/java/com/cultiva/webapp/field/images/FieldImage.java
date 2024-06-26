@@ -1,8 +1,7 @@
 package com.cultiva.webapp.field.images;
 
 import java.time.LocalDate;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
 
 import jakarta.persistence.*;
 import lombok.*;

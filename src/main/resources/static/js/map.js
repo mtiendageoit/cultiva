@@ -390,10 +390,18 @@ const OlMapField = ((element) => {
 
     Indices.loadingLegend();
     const url = `api/fields/${field.uuid}/image?indice=${indiceId}&from=${from}`;
-    $.post(url).done((image) => {
-      addFieldImageToMap(image);
-      Indices.showIndiceFieldStatistics(JSON.parse(image.stats));
-    }).fail(() => {
+    $.post(url).done((response) => {
+      if (response.status === 'READY') {
+        addFieldImageToMap(response.fieldImage);
+        Indices.showIndiceFieldStatistics(JSON.parse(response.fieldImage.stats));
+      } else if (response.status === 'PROCESSING_ORDER') {
+        toastr.info(`La orden se está procesando,por favor intente nuevamente más tarde.`);
+      }
+    }).fail((error) => {
+      const code = error.responseJSON.code;
+      if (code === 'PlanetImagesUnavailable') {
+        return toastr.info(`No hay imagenes disponibles para el lote seleccionado con fecha ${from}.`,'Sin imagenes disponibles');
+      }
       toastr.warning(`Ocurrio un error al ejecutar la acción, intente nuevamente más tarde.`);
     }).always(() => {
       resetFieldStyle(field);
@@ -452,7 +460,7 @@ const OlMapField = ((element) => {
     for (let i = 0; i < dates.length; i++) {
       const date = dates[i];
 
-      if (date.cloudyPercentage <= 20) {
+      if (date.cloudyPercentage <= 100) {
         return date;
       }
     }
