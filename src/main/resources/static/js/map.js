@@ -353,14 +353,14 @@ const OlMapField = ((element) => {
       const feature = features[0];
       if (feature) {
         processFeature = feature;
-        getDatesForFieldImages();
+        // getDatesForFieldImages();
       }
     }
   }
 
   function getDatesForFieldImages() {
     element.removeFieldImage();
-    element.loadingUI(true);
+    // element.loadingUI(true);
 
     const field = processFeature.get('field');
     const url = `api/fields/${field.uuid}/images-dates`;
@@ -378,7 +378,7 @@ const OlMapField = ((element) => {
   element.getImageForSelectedField = () => {
     if (processFeature) {
       element.removeFieldImage();
-      element.loadingUI(true);
+      // element.loadingUI(true);
       getIndiceImageField();
     }
   };
@@ -390,22 +390,24 @@ const OlMapField = ((element) => {
 
     Indices.loadingLegend();
     const url = `api/fields/${field.uuid}/image?indice=${indiceId}&from=${from}`;
-    $.post(url).done((response) => {
-      if (response.status === 'READY') {
-        addFieldImageToMap(response.fieldImage);
-        Indices.showIndiceFieldStatistics(JSON.parse(response.fieldImage.stats));
-      } else if (response.status === 'PROCESSING_ORDER') {
-        toastr.info(`La orden se está procesando,por favor intente nuevamente más tarde.`);
+    $.post(url).done((image) => {
+      if (image.status === 'queued') {
+        return toastr.info(`La imagen para el lote se está procesando. Fecha: ${from}`, 'Procesando imagen');
+      } else if (image.status === 'failed') {
+        toastr.warning(`No se pudo obtener la imagen para el lote seleccionado. Fecha: ${from}`, 'Imagen de lote');
+      } else if (image.status === 'success') {
+        addFieldImageToMap(image.fieldImage);
+        Indices.showIndiceFieldStatistics(JSON.parse(image.fieldImage.stats));
       }
     }).fail((error) => {
       const code = error.responseJSON.code;
       if (code === 'PlanetImagesUnavailable') {
-        return toastr.info(`No hay imagenes disponibles para el lote seleccionado con fecha ${from}.`,'Sin imagenes disponibles');
+        return toastr.warning(`No hay imagenes disponibles para el lote seleccionado con fecha ${from}.`, 'Sin imagenes disponibles');
       }
       toastr.warning(`Ocurrio un error al ejecutar la acción, intente nuevamente más tarde.`);
     }).always(() => {
-      resetFieldStyle(field);
-      element.loadingUI(false);
+      // resetFieldStyle(field);
+      // element.loadingUI(false);
     });
   }
 

@@ -53,7 +53,7 @@ public class FieldsController {
   }
 
   @PostMapping("/{uuid}/image")
-  public FieldImageResult indiceImageField(@PathVariable String uuid, @RequestParam int indice,
+  public FieldImage indiceImageField(@PathVariable String uuid, @RequestParam int indice,
       @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate from,
       @AuthenticationPrincipal UserPrincipal principal) {
     return service.indiceImageField(uuid, indice, from, principal);

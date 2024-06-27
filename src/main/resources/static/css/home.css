@@ -17,6 +17,10 @@ body,
   background-color: #f2f2f7;
 }
 
+.field-list-item.active {
+  background-color: #f2f2f7;
+}
+
 .field-list-item-name {
   line-height: normal;
   max-width: 11rem;

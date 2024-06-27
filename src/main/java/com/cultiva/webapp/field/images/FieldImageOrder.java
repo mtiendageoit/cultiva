@@ -1,6 +1,8 @@
 package com.cultiva.webapp.field.images;
 
 import java.time.LocalDate;
+
+import com.cultiva.webapp.planet.orders.OrderStatus;
 import com.fasterxml.jackson.annotation.*;
 
 import jakarta.persistence.*;
@@ -11,32 +13,31 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "field_images")
-public class FieldImage {
+@Table(name = "fiel_images_queued")
+public class FieldImageOrder {
   @Id
   @JsonIgnore
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
 
   private String uuid;
-
-  @JsonIgnore
   private long fieldId;
-
-  @JsonIgnore
   private int fieldVersion;
-
-  @JsonIgnore
   private int indiceId;
-
-  @JsonIgnore
   private long userId;
-
   @JsonFormat(pattern = "dd/MM/yyyy")
   private LocalDate imageDate;
-
   private String stats;
-
+  
   @Enumerated(EnumType.STRING)
   private FieldImageStatus status;
+
+  private String geeProject;
+  private String geeFolder;
+  private String geeCollection;
+
+  private String planetItemId;
+  private String planetOrderId;
+
+  @Enumerated(EnumType.STRING)
+  private OrderStatus orderStatus;
 }

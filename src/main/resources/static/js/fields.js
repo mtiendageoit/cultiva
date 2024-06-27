@@ -5,6 +5,7 @@ const Fields = ((element) => {
 
   function init() {
     initUI();
+    // return
     getUserFields();
   }
 
@@ -338,6 +339,8 @@ const Fields = ((element) => {
       fields.forEach(showField);
 
       OlMap.activeMapEvents(true);
+
+      Tasks.getUserTasks();
     });
   }
 
@@ -352,46 +355,64 @@ const Fields = ((element) => {
 
   function templateFieldUI(field) {
     return `
-        <div id="field-${field.uuid}" class="px-2 py-1 justify-content-between align-items-center field-list-item" fieldname="${field.name}" style="display:flex">
-          <div class="d-flex align-items-center">
-            <div onclick="Fields.goToFieldInMap('${field.uuid}')" class="border p-2 rounded bg-dark" style="position: relative;opacity: 95%; cursor:pointer;">
-              <i class="fas fa-seedling text-large text-white"></i>
-              <i class="fas fa-seedling text-large" style="color: ${field.borderColor}; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></i>
-            </div>
-            <div>
-              <p class="font-weight-bold m-0 text-truncate field-list-item-name">${field.name}</p>
-              <small class="font-weight-normal">${Measure.areaM2ToHa(field.areaM2)} ha</small>
-            </div>
-          </div>
-          <div class="btn-group dropright">
-            <button id="field-ddm-${field.uuid}" type="button"
-              class="btn btn-sm btn-default icon-btn borderless rounded-pill md-btn-flat dropdown-toggle hide-arrow disabled-on-edit-geometry"
-              data-toggle="dropdown" aria-expanded="true" data-boundary="viewport">
-              <i class="fas fa-ellipsis-v"></i>
-            </button>
-            <div class="dropdown-menu" aria-labelledby="field-ddm-${field.uuid}">
-              <a onclick="Fields.goToFieldInMap('${field.uuid}')" class="dropdown-item" href="javascript:void(0)">
-                <i class="fas fa-map-pin"></i>&nbsp; Ubicar en mapa
-              </a>
-              <div class="dropdown-toggle">
-                <div class="dropdown-item">
-                  <i class="fas fa-pencil-alt"></i>&nbsp; Editar
-                </div>
-                <div class="dropdown-menu" style="margin-left:-1px;">
-                  <a class="dropdown-item" onclick="Fields.editGeometry('${field.uuid}')" href="javascript:void(0)">
-                    <i class="fas fa-vector-square"></i>&nbsp; Límites
-                  </a>
-                  <a class="dropdown-item" onclick="Fields.editAttributes('${field.uuid}')" href="javascript:void(0)">
-                    <i class="far fa-list-alt"></i>&nbsp; Datos y cultivo
-                  </a>
-                </div>
+    <div id="field-${field.uuid}" class="px-2 py-1 justify-content-between align-items-center field-list-item" fieldname="${field.name}" uuid="${field.uuid}">
+      <div class="d-flex align-items-center flex-grow-1">
+        <div onclick="Fields.goToFieldInMap('${field.uuid}')" class="border p-2 rounded bg-dark"
+          style="position: relative;opacity: 95%; cursor:pointer;">
+          <i class="fas fa-seedling text-large text-white"></i>
+          <i class="fas fa-seedling text-large"
+            style="color: ${field.borderColor}; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></i>
+        </div>
+        <div class="flex-grow-1">
+          <div class="d-flex align-items-center flex-grow-1">
+            <div class="flex-grow-1">
+              <p class="font-weight-bold m-0 text-truncate field-list-item-name">${field.name}
+              </p>
+              <div class="d-flex justify-content-between">
+                <small class="font-weight-normal">${Measure.areaM2ToHa(field.areaM2)} ha</small>
+                <a href="#" id="field-processing-${field.uuid}" class="font-weight-normal text-primary" style="display:none;">Procesando (7)</a>
               </div>
-              <a onclick="Fields.deleteField('${field.uuid}','${field.name}')" class="dropdown-item" href="javascript:void(0)">
-                <i class="fas fa-trash-alt"></i>&nbsp; Eliminar
-              </a>
+            </div>
+            <div class="btn-group dropright">
+              <button id="field-ddm-${field.uuid}" type="button"
+                class="btn btn-sm btn-default icon-btn borderless rounded-pill md-btn-flat dropdown-toggle hide-arrow disabled-on-edit-geometry"
+                data-toggle="dropdown" aria-expanded="true" data-boundary="viewport">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+              <div class="dropdown-menu" aria-labelledby="field-ddm-${field.uuid}">
+                <a onclick="Fields.goToFieldInMap('${field.uuid}')" class="dropdown-item"
+                  href="javascript:void(0)">
+                  <i class="fas fa-map-pin"></i>&nbsp; Ubicar en mapa
+                </a>
+                <div class="dropdown-toggle">
+                  <div class="dropdown-item">
+                    <i class="fas fa-pencil-alt"></i>&nbsp; Editar
+                  </div>
+                  <div class="dropdown-menu" style="margin-left:-1px;">
+                    <a class="dropdown-item" onclick="Fields.editGeometry('${field.uuid}')"
+                      href="javascript:void(0)">
+                      <i class="fas fa-vector-square"></i>&nbsp; Límites
+                    </a>
+                    <a class="dropdown-item" onclick="Fields.editAttributes('${field.uuid}')"
+                      href="javascript:void(0)">
+                      <i class="far fa-list-alt"></i>&nbsp; Datos y cultivo
+                    </a>
+                  </div>
+                </div>
+                <a onclick="Fields.deleteField('${field.uuid}','${field.name}')"
+                  class="dropdown-item" href="javascript:void(0)">
+                  <i class="fas fa-trash-alt"></i>&nbsp; Eliminar
+                </a>
+              </div>
             </div>
           </div>
+          <div id="field-progress-${field.uuid}" class="progress" style="height: 4px;margin-right: 13px; display:none;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100"
+              aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+          </div>
+        </div>
       </div>
+    </div>
     `;
   }
 

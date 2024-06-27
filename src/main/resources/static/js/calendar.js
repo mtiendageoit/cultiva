@@ -1,4 +1,5 @@
 const CalendarImages = (function (element) {
+  const DayStatus = { success: 'fas fa-cog', queued: 'fas fa-cog', failed: 'fas fa-ban' }
   const calendarImages = $('#calendarImages');
   const container = $('#calendarImagesContainer');
   let currentDates;
@@ -45,7 +46,58 @@ const CalendarImages = (function (element) {
       format: 'dd/mm/yyyy',
       orientation: 'bottom right',
       container: '#calendarImagesContainer',
-    }).on('changeDate', onChangeDate);
+      beforeShowDay: beforeShowDay,
+    }).on('changeDate', onChangeDate)
+      .on('changeMonth', onChangeMonth);
+  }
+
+  function beforeShowDay(date) {
+    const day = date.getDate();
+    switch (date.getDate()) {
+      case 4:
+        return {
+          content: `
+              <div>
+                <b>${day}</b>
+                <i class="fas fa-cog" style="position:absolute;font-size: xx-small;"></i>
+              </div>
+            `
+        };
+      case 6:
+      case 7:
+        return {
+          content: `
+            <div>
+              <b>${day}</b>
+              <i class="fas fa-check" style="position:absolute;font-size: xx-small;"></i>
+            </div>
+          `
+        };
+      case 8:
+        return {
+          content: `
+            <div>
+              <b>${day}</b>
+              <i class="fas fa-ban" style="position:absolute;font-size: xx-small;"></i>
+            </div>
+          `
+        };
+      case 12:
+        return "green";
+    }
+  }
+
+  function dayTemplate(day, dayStatus) {
+    return `
+      <div>
+        <b>${day}</b>
+        <i class="${dayStatus}" style="position:absolute;font-size: xx-small;"></i>
+      </div>
+    `;
+  }
+
+  function onChangeMonth(e) {
+    console.log(e);
   }
 
   function onChangeDate(e) {
