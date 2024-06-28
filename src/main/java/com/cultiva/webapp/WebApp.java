@@ -7,7 +7,6 @@ import org.springframework.scheduling.annotation.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @EnableAsync
-@EnableScheduling
 @SpringBootApplication
 public class WebApp {
 

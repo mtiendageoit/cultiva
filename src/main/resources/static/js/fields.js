@@ -108,7 +108,7 @@ const Fields = ((element) => {
 
   element.filter = (filterText) => {
     $('#userFieldsList .field-list-item').filter(function () {
-      $(this).toggle($(this).attr('fieldname').toLowerCase().indexOf(filterText) > -1);
+      $(this).toggle($(this).attr('fieldname').toLowerCase().indexOf(filterText.toLowerCase()) > -1);
     });
   };
 
@@ -372,7 +372,7 @@ const Fields = ((element) => {
               </p>
               <div class="d-flex justify-content-between">
                 <small class="font-weight-normal">${Measure.areaM2ToHa(field.areaM2)} ha</small>
-                <a href="#" id="field-processing-${field.uuid}" class="font-weight-normal text-primary" style="display:none;">Procesando (7)</a>
+                <a onclick="Orders.showOrdersField('${field.uuid}')" href="javascript:void(0)" id="field-processing-${field.uuid}" class="font-weight-normal text-primary" style="display:none;">Procesando (7)</a>
               </div>
             </div>
             <div class="btn-group dropright">
@@ -391,17 +391,17 @@ const Fields = ((element) => {
                     <i class="fas fa-pencil-alt"></i>&nbsp; Editar
                   </div>
                   <div class="dropdown-menu" style="margin-left:-1px;">
-                    <a class="dropdown-item" onclick="Fields.editGeometry('${field.uuid}')"
+                    <a id="field-menu-item-edit-geometry-${field.uuid}" class="dropdown-item" onclick="Fields.editGeometry('${field.uuid}')"
                       href="javascript:void(0)">
                       <i class="fas fa-vector-square"></i>&nbsp; Límites
                     </a>
-                    <a class="dropdown-item" onclick="Fields.editAttributes('${field.uuid}')"
+                    <a id="field-menu-item-edit-attributes-${field.uuid}" class="dropdown-item" onclick="Fields.editAttributes('${field.uuid}')"
                       href="javascript:void(0)">
                       <i class="far fa-list-alt"></i>&nbsp; Datos y cultivo
                     </a>
                   </div>
                 </div>
-                <a onclick="Fields.deleteField('${field.uuid}','${field.name}')"
+                <a id="field-menu-item-delete-${field.uuid}" onclick="Fields.deleteField('${field.uuid}','${field.name}')"
                   class="dropdown-item" href="javascript:void(0)">
                   <i class="fas fa-trash-alt"></i>&nbsp; Eliminar
                 </a>

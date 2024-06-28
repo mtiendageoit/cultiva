@@ -1,9 +1,13 @@
 package com.cultiva.webapp.planet;
 
+
+import org.springframework.data.domain.*;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import com.cultiva.webapp.planet.orders.OrdersCountAndField;
+import com.cultiva.webapp.dto.PageResult;
+import com.cultiva.webapp.planet.orders.*;
 import com.cultiva.webapp.security.UserPrincipal;
 
 import lombok.AllArgsConstructor;
@@ -18,5 +22,20 @@ public class OrdersController {
   public OrdersCountAndField getOrdersCountAndFieldOrders(@RequestParam(required = false) String fieldUuid,
       @AuthenticationPrincipal UserPrincipal principal) {
     return orderService.getOrdersCountAndFieldOrders(fieldUuid, principal);
+  }
+
+  @GetMapping("/orders/filter")
+  public PageResult<FieldOrder> fieldOrdersBy(FieldOrdersFilter filter, @PageableDefault Pageable pageable,
+      @RequestParam int draw, @AuthenticationPrincipal UserPrincipal principal) {
+
+    Page<FieldOrder> orders = orderService.fieldOrdersBy(filter, principal, pageable);
+
+    PageResult<FieldOrder> page = new PageResult<>();
+    page.setDraw(draw);
+    page.setRecordsTotal(orders.getTotalElements());
+    page.setRecordsFiltered(orders.getTotalElements());
+    page.setData(orders.getContent());
+
+    return page;
   }
 }

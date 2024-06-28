@@ -27,6 +27,7 @@
   <link rel="stylesheet" href="vendor/libs/select2/select2.css">
   <link rel="stylesheet" href="vendor/libs/minicolors/minicolors.css">
   <link rel="stylesheet" href="vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css">
+  <link rel="stylesheet" href="vendor/libs/datatables/datatables.css">
 
   <link rel="stylesheet" href="vendor/libs/toastr/toastr.css">
 
@@ -94,7 +95,7 @@
                         <div id="userFieldsList" style="overflow-y: auto; overflow-x: hidden;">
 
 
-                          
+
                         </div>
                       </div>
                     </div>
@@ -310,6 +311,57 @@
     </div>
   </div>
 
+  <div class="modal fade" id="fieldOrdersModal" data-backdrop="static">
+    <div class="modal-dialog modal-xl">
+      <form id="fieldOrdersForm" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Ordenes del lote</h5>
+        </div>
+        <div class="modal-body py-4">
+          <div class="form-row">
+            <div class="form-group col-6">
+              <label class="form-label">Lote</label>
+              <select id="fomFieldFilter" class="form-control" style="width: 100%" data-allow-clear="true"
+                data-placeholder="Selecciona un lote">
+              </select>
+            </div>
+            <div class="form-group col-4">
+              <label class="form-label">Estado</label>
+              <select id="fomStatusFilter" class="form-control" style="width: 100%" data-allow-clear="true"
+                data-placeholder="Selecciona un status">
+                <option value="-1">Todos</option>
+                <option value="queued">Processing</option>
+                <option value="success">Success</option>
+                <option value="failed">Failed</option>
+              </select>
+            </div>
+            <div class="form-group col-2 d-flex align-items-end">
+              <button id="fomShowAllFilterBtn" type="button" class="btn btn-success btn-block">Ver todo</button>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col">
+              <table id="fomOrdersTable" class="table table-bordered table-hover table-striped table-primary">
+                <thead>
+                  <tr class="bg-info-900">
+                    <th class="fw-900">Lote</th>
+                    <th class="fw-900">Fecha procesada</th>
+                    <th class="fw-900">Estado de orden</th>
+                    <th class="fw-900">Fecha creación</th>
+                    <th class="fw-900">Tiempo tomado</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="fomCloseBtn" type="button" class="btn btn-success" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="modal fade" id="saveFieldModal" data-backdrop="static">
     <div class="modal-dialog">
       <form id="fieldForm" class="modal-content">
@@ -486,7 +538,8 @@
                           </div>
                         </div>
                       </td>
-                      <td><div class="card card-body">
+                      <td>
+                        <div class="card card-body">
                           <h6 class="m-0">Martes</h6>
                           <p>18 Jun</p>
                           <div class="text-center d-flex align-items-center" style="gap: 0;">
@@ -510,8 +563,10 @@
                             <div class="ion ion-ios-leaf mr-2 mb-1"></div>
                             <p class="m-0">-4 <sup>o</sup>C</p>
                           </div>
-                        </div></td>
-                      <td><div class="card card-body">
+                        </div>
+                      </td>
+                      <td>
+                        <div class="card card-body">
                           <h6 class="m-0">Miercoles</h6>
                           <p>19 Jun</p>
                           <div class="text-center d-flex align-items-center" style="gap: 0;">
@@ -535,8 +590,10 @@
                             <div class="ion ion-ios-leaf mr-2 mb-1"></div>
                             <p class="m-0">-4 <sup>o</sup>C</p>
                           </div>
-                        </div></td>
-                      <td><div class="card card-body">
+                        </div>
+                      </td>
+                      <td>
+                        <div class="card card-body">
                           <h6 class="m-0">Jueves</h6>
                           <p>20 Jun</p>
                           <div class="text-center d-flex align-items-center" style="gap: 0;">
@@ -560,8 +617,10 @@
                             <div class="ion ion-ios-leaf mr-2 mb-1"></div>
                             <p class="m-0">-4 <sup>o</sup>C</p>
                           </div>
-                        </div></td>
-                      <td><div class="card card-body">
+                        </div>
+                      </td>
+                      <td>
+                        <div class="card card-body">
                           <h6 class="m-0">Viernes</h6>
                           <p>21 Jun</p>
                           <div class="text-center d-flex align-items-center" style="gap: 0;">
@@ -585,8 +644,10 @@
                             <div class="ion ion-ios-leaf mr-2 mb-1"></div>
                             <p class="m-0">-4 <sup>o</sup>C</p>
                           </div>
-                        </div></td>
-                      <td><div class="card card-body">
+                        </div>
+                      </td>
+                      <td>
+                        <div class="card card-body">
                           <h6 class="m-0">Sabado</h6>
                           <p>22 Jun</p>
                           <div class="text-center d-flex align-items-center" style="gap: 0;">
@@ -610,8 +671,10 @@
                             <div class="ion ion-ios-leaf mr-2 mb-1"></div>
                             <p class="m-0">-4 <sup>o</sup>C</p>
                           </div>
-                        </div></td>
-                      <td><div class="card card-body">
+                        </div>
+                      </td>
+                      <td>
+                        <div class="card card-body">
                           <h6 class="m-0">Domingo</h6>
                           <p>23 Jun</p>
                           <div class="text-center d-flex align-items-center" style="gap: 0;">
@@ -635,7 +698,8 @@
                             <div class="ion ion-ios-leaf mr-2 mb-1"></div>
                             <p class="m-0">-4 <sup>o</sup>C</p>
                           </div>
-                        </div></td>
+                        </div>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -656,7 +720,7 @@
   <script src="vendor/libs/popper/popper.js"></script>
   <script src="vendor/js/bootstrap.js"></script>
   <script src="vendor/libs/select2/select2.js"></script>
-  <script src="vendor/libs/select2/select2.js"></script>
+  <script src="vendor/libs/datatables/datatables.js"></script>
   <script src="vendor/libs/minicolors/minicolors.js"></script>
   <script src="vendor/libs/toastr/toastr.js"></script>
   <script src="vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js"></script>

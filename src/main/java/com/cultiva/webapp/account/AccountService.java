@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.cultiva.webapp.exception.InvalidPasswordException;
 import com.cultiva.webapp.field.FieldService;
+import com.cultiva.webapp.planet.PlanetService;
 import com.cultiva.webapp.security.UserPrincipal;
 import com.cultiva.webapp.user.*;
 
@@ -21,6 +22,7 @@ public class AccountService {
   private final UserRepository userRepository;
 
   private final FieldService fieldService;
+  private final PlanetService planetService;
   // private final FieldRepository fieldRepository;
 
   public void chagePassword(ChangePasswordDto input, UserPrincipal principal) {
@@ -36,6 +38,7 @@ public class AccountService {
 
   @Transactional
   public void deleteAccount(UserPrincipal principal) {
+    planetService.deleteOrdersBy(principal.getId());
     fieldService.deleteFieldsFor(principal.getId());
 
     userRepository.deleteById(principal.getId());

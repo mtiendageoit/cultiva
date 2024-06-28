@@ -1,15 +1,4 @@
 const Calendar = (function (element) {
-  const DayStatus = {
-    success: 'fas fa-check',
-    queued: 'fas fa-cog',
-    failed: 'fas fa-ban',
-    from(status) {
-      if (status == 'success') return DayStatus.success;
-      if (status == 'queued') return DayStatus.queued;
-      if (status == 'failed') return DayStatus.failed;
-    }
-  }
-
   const CurrentOrders = [];
   const calendarImages = $('#calendarImages');
 
@@ -51,17 +40,17 @@ const Calendar = (function (element) {
       const order = CurrentOrders.find(order => order.imageDate == currentDate);
       if (order) {
         return {
-          content: dayTemplate(date.getDate(), DayStatus.from(order.status))
+          content: dayTemplate(date.getDate(), OrderStatus.from(order.status).cssIcon)
         };
       }
     }
   }
 
-  function dayTemplate(day, dayStatus) {
+  function dayTemplate(day, cssIcon) {
     return `
       <div>
         <b>${day}</b>
-        <i class="${dayStatus}" style="position:absolute;font-size: xx-small;"></i>
+        <i class="${cssIcon}" style="position:absolute;font-size: xx-small;"></i>
       </div>
     `;
   }

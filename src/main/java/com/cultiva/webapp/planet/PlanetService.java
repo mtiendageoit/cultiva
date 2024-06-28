@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.cultiva.webapp.field.*;
 import com.cultiva.webapp.planet.orders.*;
@@ -47,6 +49,23 @@ public class PlanetService {
 
   public Order save(Order order) {
     return orderRepo.save(order);
+  }
+
+  public Page<FieldOrder> fieldOrdersBy(FieldOrdersFilter filter, UserPrincipal principal, Pageable pageable) {
+    if (StringUtils.hasText(filter.getFieldUuid()) && filter.getStatus() != null) {
+      return fieldOrderRepo.findByFieldUuidAndStatusAndUserId(filter.getFieldUuid(), filter.getStatus(),
+          principal.getId(), pageable);
+    } else if (StringUtils.hasText(filter.getFieldUuid()) && filter.getStatus() == null) {
+      return fieldOrderRepo.findByFieldUuidAndUserId(filter.getFieldUuid(), principal.getId(), pageable);
+    } else if (!StringUtils.hasText(filter.getFieldUuid()) && filter.getStatus() != null) {
+      return fieldOrderRepo.findByUserIdAndStatus(principal.getId(), filter.getStatus(), pageable);
+    } else {
+      return fieldOrderRepo.findByUserId(principal.getId(), pageable);
+    }
+  }
+
+  public void deleteOrdersBy(long userId){
+    orderRepo.deleteByUserId(userId);
   }
 
 }

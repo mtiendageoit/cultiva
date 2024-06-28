@@ -75,7 +75,7 @@ public class FieldService {
 
   private void deleteFieldImages(List<FieldImage> images) {
     fieldImageRepository.deleteAll(images);
-    googleCloudClient.deleteFieldImages(images);
+    // googleCloudClient.deleteFieldImages(images);
   }
 
   public Field update(String uuid, FieldDto input) {
@@ -150,6 +150,7 @@ public class FieldService {
     FieldImage image;
     if (indiceImageField.isPresent()) {
       image = indiceImageField.get();
+      fieldImageUuid = image.getUuid();
     } else {
       image = FieldImage.builder()
           .uuid(fieldImageUuid)
@@ -163,7 +164,7 @@ public class FieldService {
 
     try {
       FieldImageStatistics stats = googleCloudClient.processIndiceImageField(fieldImageUuid, geeImage, indice);
-      if(stats!=null){
+      if (stats != null) {
         image.setStats(stats.toJsonString());
       }
       image.setStatus(FieldImageStatus.success);
