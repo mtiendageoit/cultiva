@@ -18,7 +18,9 @@ import com.cultiva.webapp.field.images.*;
 import com.cultiva.webapp.indices.Indice;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class GoogleCloudClient {
@@ -39,11 +41,10 @@ public class GoogleCloudClient {
           FieldImageStatistics.class);
       return response.getBody();
     } catch (Exception e) {
-      e.getMessage();
-      System.err.println(e.getMessage());
+      log.error(e.getMessage(), e);
+      log.error("Error al procesar el indice imageName: {}, geeImageId: {}, indice: {}", imageName, geeImageId, indice);
+      throw new BaseException("Error a la hora de procesar el indice");
     }
-
-    return null;
   }
 
   public PlanetOrderResponse processPlanetOrder(Field field, LocalDate from) {

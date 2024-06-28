@@ -101,6 +101,11 @@ const Fields = ((element) => {
 
   }
 
+  element.selectField = (field) => {
+    $('#userFieldsList .field-list-item').removeClass('active');
+    $(`#field-${field.uuid}`).addClass('active');
+  };
+
   element.filter = (filterText) => {
     $('#userFieldsList .field-list-item').filter(function () {
       $(this).toggle($(this).attr('fieldname').toLowerCase().indexOf(filterText) > -1);
@@ -119,7 +124,6 @@ const Fields = ((element) => {
   element.editGeometry = (uuid) => {
 
     Indices.showIndices(false);
-    CalendarImages.showCalendar(false);
     OlMapField.setVisibleFieldImage(false);
 
     OlMap.goToFeature(uuid);
@@ -195,7 +199,6 @@ const Fields = ((element) => {
     showEditGeometryTools(false);
 
     Indices.showIndices(true);
-    CalendarImages.showCalendar(true);
     OlMapField.setVisibleFieldImage(true);
   }
 
@@ -231,7 +234,6 @@ const Fields = ((element) => {
       const isProcessField = processField.uuid == uuid;
       if (isProcessField) {
         Indices.showIndices(false);
-        CalendarImages.showCalendar(false);
         OlMapField.removeFieldImage(false);
       }
     }
@@ -340,7 +342,7 @@ const Fields = ((element) => {
 
       OlMap.activeMapEvents(true);
 
-      Tasks.getUserTasks();
+      Orders.getOrdersAndCount();
     });
   }
 

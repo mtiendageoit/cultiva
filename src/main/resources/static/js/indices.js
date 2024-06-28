@@ -107,10 +107,8 @@ const Indices = ((element) => {
 
   element.showIndices = (show) => {
     if (show) {
-      container.show();
       // legend.show();
     } else {
-      container.hide();
       legend.hide();
     }
   };

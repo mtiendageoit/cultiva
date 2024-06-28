@@ -1,36 +1,29 @@
-const CalendarImages = (function (element) {
-  const DayStatus = { success: 'fas fa-cog', queued: 'fas fa-cog', failed: 'fas fa-ban' }
-  const calendarImages = $('#calendarImages');
-  const container = $('#calendarImagesContainer');
-  let currentDates;
-
-  element.showCalendar = (show) => {
-    if (show) container.show();
-    else container.hide();
-  };
-
-  element.setDates = (dates) => {
-    const hasDates = dates && dates.length > 0;
-
-    if (hasDates) {
-      currentDates = dates;
-      const startDate = currentDates[currentDates.length - 1].imageDate;
-      calendarImages.datepicker('setStartDate', startDate);
-
-      const endDate = currentDates[0].imageDate;
-      calendarImages.datepicker('setEndDate', endDate);
+const Calendar = (function (element) {
+  const DayStatus = {
+    success: 'fas fa-check',
+    queued: 'fas fa-cog',
+    failed: 'fas fa-ban',
+    from(status) {
+      if (status == 'success') return DayStatus.success;
+      if (status == 'queued') return DayStatus.queued;
+      if (status == 'failed') return DayStatus.failed;
     }
+  }
 
-    element.showCalendar(hasDates);
-    Indices.showIndices(hasDates);
+  const CurrentOrders = [];
+  const calendarImages = $('#calendarImages');
+
+  element.showOrders = (orders) => {
+    const selected = calendarImages.datepicker('getDate');
+    CurrentOrders.length = 0;
+    if(orders){
+      CurrentOrders.push(...orders);
+    }
+    calendarImages.datepicker('update', selected);
   };
 
-  element.getDate = () => {
+  element.getSelectedDate = () => {
     return formatDate(calendarImages.datepicker('getDate'));
-  };
-
-  element.select = (date) => {
-    calendarImages.datepicker("update", date);
   };
 
   function init() {
@@ -43,47 +36,24 @@ const CalendarImages = (function (element) {
       todayBtn: true,
       language: 'es',
       todayHighlight: false,
+      endDate: '0',
+      startDate: new Date(2023, 0, 1),
       format: 'dd/mm/yyyy',
       orientation: 'bottom right',
       container: '#calendarImagesContainer',
       beforeShowDay: beforeShowDay,
-    }).on('changeDate', onChangeDate)
-      .on('changeMonth', onChangeMonth);
+    }).on('changeDate', onChangeDate);
   }
 
   function beforeShowDay(date) {
-    const day = date.getDate();
-    switch (date.getDate()) {
-      case 4:
+    if (CurrentOrders.length > 0) {
+      const currentDate = formatDate(date);
+      const order = CurrentOrders.find(order => order.imageDate == currentDate);
+      if (order) {
         return {
-          content: `
-              <div>
-                <b>${day}</b>
-                <i class="fas fa-cog" style="position:absolute;font-size: xx-small;"></i>
-              </div>
-            `
+          content: dayTemplate(date.getDate(), DayStatus.from(order.status))
         };
-      case 6:
-      case 7:
-        return {
-          content: `
-            <div>
-              <b>${day}</b>
-              <i class="fas fa-check" style="position:absolute;font-size: xx-small;"></i>
-            </div>
-          `
-        };
-      case 8:
-        return {
-          content: `
-            <div>
-              <b>${day}</b>
-              <i class="fas fa-ban" style="position:absolute;font-size: xx-small;"></i>
-            </div>
-          `
-        };
-      case 12:
-        return "green";
+      }
     }
   }
 
@@ -96,20 +66,18 @@ const CalendarImages = (function (element) {
     `;
   }
 
-  function onChangeMonth(e) {
-    console.log(e);
-  }
-
   function onChangeDate(e) {
     OlMapField.getImageForSelectedField();
   }
 
   function formatDate(date) {
-    return new Date(date).toLocaleDateString("es-MX", {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
+    if (date) {
+      return new Date(date).toLocaleDateString("es-MX", {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    }
   }
 
   init();

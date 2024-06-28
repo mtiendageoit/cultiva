@@ -19,8 +19,13 @@ public class Order {
   @JsonIgnore
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @JsonIgnore
   private Long userId;
+
+  @JsonIgnore
   private Long fieldId;
+
   private Integer fieldVersion;
   
   @JsonFormat(pattern = "dd/MM/yyyy")
@@ -29,12 +34,22 @@ public class Order {
   @Enumerated(EnumType.STRING)
   private OrderStatus status;
 
+  @JsonIgnore
   private String geeProject;
+
+  @JsonIgnore
   private String geeFolder;
+
+  @JsonIgnore
   private String geeCollection;
 
+  @JsonIgnore
   private String planetItemId;
+
+  @JsonIgnore
   private String planetOrderId;
+
+  @JsonIgnore
   private String planetOrderName;
 
   @JsonIgnore

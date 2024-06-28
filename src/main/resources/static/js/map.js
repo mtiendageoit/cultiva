@@ -266,7 +266,6 @@ const OlMap = ((element) => {
 const OlMapField = ((element) => {
   let processFeature;
   let mouseOverFeature;
-  let originalMouseOverFeatureStyle;
   const imageLayer = new ol.layer.WebGLTile({ source: null });
   const tooltip = document.getElementById('tooltip');
   const overlay = new ol.Overlay({
@@ -284,7 +283,7 @@ const OlMapField = ((element) => {
     activeSingleClick(active);
     activePointerMove(active);
 
-    olMap.getViewport().style.cursor = active ? 'pointer' : '';
+    // olMap.getViewport().style.cursor = active ? 'pointer' : '';
   }
 
   function activePointerMove(active) {
@@ -297,14 +296,19 @@ const OlMapField = ((element) => {
 
   function pointerMoveListener(evt) {
     if (mouseOverFeature) {
-      mouseOverFeature.setStyle(originalMouseOverFeatureStyle);
+      const isSelected = mouseOverFeature.get('isSelected');
+      if (!isSelected) {
+        resetFeatureToFieldStyle(mouseOverFeature);
+      }
       mouseOverFeature = null;
     }
 
     olMap.forEachFeatureAtPixel(evt.pixel, function (feature) {
       mouseOverFeature = feature;
-      originalMouseOverFeatureStyle = feature.getStyle();
-      feature.setStyle(mouseOverFeatureStyle());
+      const isSelected = mouseOverFeature.get('isSelected');
+      if (!isSelected) {
+        feature.setStyle(mouseOverFeatureStyle());
+      }
       return true;
     });
 
@@ -338,6 +342,12 @@ const OlMapField = ((element) => {
 
   }
 
+  element.getSelectedField = () => {
+    if (processFeature) {
+      return processFeature.get('field');
+    }
+  };
+
   function activeSingleClick(active) {
     if (active) {
       olMap.on('singleclick', singleClickListener);
@@ -352,52 +362,75 @@ const OlMapField = ((element) => {
     if (features) {
       const feature = features[0];
       if (feature) {
+        if (processFeature) {
+          processFeature.set('isSelected', false);
+          resetFeatureToFieldStyle(processFeature);
+        }
+
         processFeature = feature;
+        setSelectFeatureStyle(processFeature);
+
+        processSelectedField();
         // getDatesForFieldImages();
       }
     }
   }
 
-  function getDatesForFieldImages() {
-    element.removeFieldImage();
-    // element.loadingUI(true);
+  function setSelectFeatureStyle(feature) {
+    feature.setStyle(selectedFeatureStyle());
+    feature.set('isSelected', true);
+  }
 
+  function resetFeatureToFieldStyle(feature) {
+    const field = feature.get('field');
+    const style = strokeStyle(field.borderColor, field.borderSize);
+    feature.setStyle(style);
+  }
+
+  function processSelectedField() {
     const field = processFeature.get('field');
-    const url = `api/fields/${field.uuid}/images-dates`;
+    Fields.selectField(field);
+    element.loadingUI(true);
 
-    $.get(url, (dates) => {
-      CalendarImages.setDates(dates);
-      const from = getClosesImageDateToNow(dates);
-      if (from) {
-        CalendarImages.select(from.imageDate);
-        getIndiceImageField();
+    Notifications.showNotification('Consultando ordenes');
+    Orders.getOrdersAndCount(field, () => {
+      const selectedDate = Calendar.getSelectedDate();
+      if (selectedDate) {
+        element.getImageForSelectedField();
+      } else {
+        element.loadingUI(false);
+        Notifications.loading(false);
+        setSelectFeatureStyle(processFeature);
+        return toastr.info(`Seleccione una fecha para ver la imagen del índice.`);
       }
     });
   }
 
+
   element.getImageForSelectedField = () => {
     if (processFeature) {
       element.removeFieldImage();
-      // element.loadingUI(true);
       getIndiceImageField();
     }
   };
 
   function getIndiceImageField() {
-    const from = CalendarImages.getDate();
+    const from = Calendar.getSelectedDate();
     const indiceId = Indices.selectedIndice().id;
     const field = processFeature.get('field');
 
     Indices.loadingLegend();
+    element.loadingUI(true);
+    Notifications.showNotification('Consultando imagen de índice');
     const url = `api/fields/${field.uuid}/image?indice=${indiceId}&from=${from}`;
     $.post(url).done((image) => {
       if (image.status === 'queued') {
-        return toastr.info(`La imagen para el lote se está procesando. Fecha: ${from}`, 'Procesando imagen');
+        return toastr.info(`La imagen para el lote se está procesando. Vuelva a intentarlo cuando haya finalizado el procesamiento. Fecha: ${from}`, 'Procesando imagen');
       } else if (image.status === 'failed') {
         toastr.warning(`No se pudo obtener la imagen para el lote seleccionado. Fecha: ${from}`, 'Imagen de lote');
       } else if (image.status === 'success') {
-        addFieldImageToMap(image.fieldImage);
-        Indices.showIndiceFieldStatistics(JSON.parse(image.fieldImage.stats));
+        addFieldImageToMap(image);
+        Indices.showIndiceFieldStatistics(JSON.parse(image.stats));
       }
     }).fail((error) => {
       const code = error.responseJSON.code;
@@ -406,8 +439,9 @@ const OlMapField = ((element) => {
       }
       toastr.warning(`Ocurrio un error al ejecutar la acción, intente nuevamente más tarde.`);
     }).always(() => {
-      // resetFieldStyle(field);
-      // element.loadingUI(false);
+      element.loadingUI(false);
+      Notifications.loading(false);
+      setSelectFeatureStyle(processFeature);
     });
   }
 
@@ -415,11 +449,9 @@ const OlMapField = ((element) => {
     if (processFeature) {
       if (loading) {
         element.activeMouseEvents(false);
-        Notifications.loading(true);
         OlAnimateLoadingFeature.animate(processFeature);
       } else {
         element.activeMouseEvents(true);
-        Notifications.loading(false);
         OlAnimateLoadingFeature.endAnimation();
       }
     }
@@ -480,6 +512,30 @@ const OlMapField = ((element) => {
     })
   }
 
+  function selectedFeatureStyle() {
+    return new ol.style.Style({
+      fill: new ol.style.Fill({
+        color: [255, 255, 255, 0.05],
+      }),
+      stroke: new ol.style.Stroke({
+        color: [255, 255, 255, 1],
+        width: 5,
+      }),
+    })
+  }
+
+  function strokeStyle(borderColor, borderSize) {
+    return new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: borderColor,
+        width: borderSize
+      }),
+      fill: new ol.style.Fill({
+        color: 'rgba(255, 255, 255, 0)'
+      })
+    });
+  };
+
   init();
 
   return element;
@@ -502,9 +558,11 @@ const OlAnimateLoadingFeature = ((element) => {
 
   element.endAnimation = () => {
     if (timer) clearInterval(timer);
+    feature = null;
   };
 
   element.animate = (f) => {
+    if (feature) return;
     feature = f;
     let offset = 0;
     feature.setStyle(style(offset));

@@ -9,18 +9,24 @@ import org.springframework.transaction.annotation.Transactional;
 import com.cultiva.webapp.exception.*;
 import com.cultiva.webapp.field.images.*;
 import com.cultiva.webapp.google.*;
+import com.cultiva.webapp.indices.Indice;
+import com.cultiva.webapp.indices.IndiceRepository;
 import com.cultiva.webapp.planet.PlanetService;
 import com.cultiva.webapp.planet.orders.*;
 import com.cultiva.webapp.security.UserPrincipal;
 import com.cultiva.webapp.utils.FakeData;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class FieldService {
   private final GoogleCloudClient googleCloudClient;
+
   private final FieldRepository repository;
+  private final IndiceRepository indiceRepository;
   private final FieldImageRepository fieldImageRepository;
 
   private final PlanetService planetService;
@@ -90,33 +96,95 @@ public class FieldService {
         .orElseThrow(() -> new NotFoundException("field-not-found", "Field not found"));
   }
 
-  public FieldImage indiceImageField(String uuid, int indiceId, LocalDate from, UserPrincipal principal) {
-    Field field = fieldByUuid(uuid);
+  @Transactional
+  public FieldImage indiceImageField(String fieldUuid, int indiceId, LocalDate from, UserPrincipal principal) {
+    Field field = fieldByUuid(fieldUuid);
 
     Optional<FieldImage> indiceImageField = fieldImageRepository.findByFieldIdAndFieldVersionAndIndiceIdAndImageDate(
         field.getId(), field.getVersion(), indiceId, from);
 
-    if (indiceImageField.isPresent()) {
+    boolean processed = indiceImageField.isPresent() && (indiceImageField.get().getStatus() == FieldImageStatus.success
+        || indiceImageField.get().getStatus() == FieldImageStatus.failed);
+    if (processed) {
       return indiceImageField.get();
     }
 
-    Optional<Order> planetOrder = planetService.orderBy(field.getId(), field.getVersion(), from);
+    String fieldImageUuid = UUID.randomUUID().toString();
 
     Order order;
+    Optional<Order> planetOrder = planetService.orderBy(field.getId(), field.getVersion(), from);
     if (planetOrder.isEmpty()) {
       order = createImageFieldOrder(field, from, principal);
-    } else {
-      order = planetOrder.get();
+      return createFieldImage(fieldImageUuid, field, indiceId, from, FieldImageStatus.valueOf(order.getStatus().name()),
+          principal.getId());
     }
 
+    order = planetOrder.get();
+
+    boolean failed = order.getStatus() == OrderStatus.failed || order.getStatus() == OrderStatus.partial
+        || order.getStatus() == OrderStatus.cancelled;
+    if (failed) {
+      if (indiceImageField.isEmpty()) {
+        return createFieldImage(fieldImageUuid, field, indiceId, from, FieldImageStatus.failed, principal.getId());
+      } else {
+        indiceImageField.get().setStatus(FieldImageStatus.failed);
+        return fieldImageRepository.save(indiceImageField.get());
+      }
+    }
+
+    if (order.getStatus() == OrderStatus.queued || order.getStatus() == OrderStatus.running) {
+      if (indiceImageField.isEmpty()) {
+        return createFieldImage(fieldImageUuid, field, indiceId, from, FieldImageStatus.queued, principal.getId());
+      } else {
+        return indiceImageField.get();
+      }
+    }
+
+    // Order Success
+
+    Indice indice = indiceRepository.findById(indiceId)
+        .orElseThrow(() -> new NotFoundException("indice-not-exists", "The indice id not exists"));
+
+    String geeImage = getGEEImageId(order);
+
+    FieldImage image;
+    if (indiceImageField.isPresent()) {
+      image = indiceImageField.get();
+    } else {
+      image = FieldImage.builder()
+          .uuid(fieldImageUuid)
+          .fieldId(field.getId())
+          .fieldVersion(field.getVersion())
+          .indiceId(indiceId)
+          .imageDate(from)
+          .userId(principal.getId())
+          .build();
+    }
+
+    try {
+      FieldImageStatistics stats = googleCloudClient.processIndiceImageField(fieldImageUuid, geeImage, indice);
+      if(stats!=null){
+        image.setStats(stats.toJsonString());
+      }
+      image.setStatus(FieldImageStatus.success);
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      image.setStatus(FieldImageStatus.failed);
+    }
+
+    return fieldImageRepository.save(image);
+  }
+
+  private FieldImage createFieldImage(String uuid, Field field, int indiceId, LocalDate from, FieldImageStatus status,
+      long userId) {
     FieldImage image = FieldImage.builder()
-        .uuid(UUID.randomUUID().toString())
+        .uuid(uuid)
         .fieldId(field.getId())
         .fieldVersion(field.getVersion())
         .indiceId(indiceId)
         .imageDate(from)
-        .status(FieldImageStatus.valueOf(order.getStatus().name()))
-        .userId(principal.getId())
+        .status(status)
+        .userId(userId)
         .build();
     return fieldImageRepository.save(image);
   }
@@ -144,6 +212,15 @@ public class FieldService {
         .build();
 
     return planetService.save(order);
+  }
+
+  private String getGEEImageId(Order order) {
+    String id = "projects/" + order.getGeeProject() + "/assets/" + order.getGeeFolder();
+    id += "/" + order.getGeeCollection() + "/";
+    id += order.getPlanetItemId();
+    id += "_3B_AnalyticMS_SR_8b_clip_";
+    id += order.getPlanetOrderId();
+    return id;
   }
 
   public List<FieldImageDateDto> fieldImages(String uuid) {
