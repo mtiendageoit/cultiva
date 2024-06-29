@@ -4,6 +4,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.cultiva.webapp.config.AppConfig;
 import com.cultiva.webapp.crop.CropService;
@@ -53,7 +54,7 @@ public class AppController {
       HttpServletRequest request) {
 
     try {
-      String appUrl = request.getContextPath();
+      String appUrl = getAppUrl(request);
       userService.registerByEmail(input, appUrl);
     } catch (AlreadyExistsException e) {
       model.addAttribute("error", "An account already exists for this email.");
@@ -83,7 +84,7 @@ public class AppController {
 
   @PostMapping("/password-reset")
   public String postPasswordReset(String email, HttpServletRequest request) {
-    String appUrl = request.getContextPath();
+    String appUrl = getAppUrl(request);
     userService.resetPassword(email, appUrl);
     return "redirect:/password-reset-success";
   }
@@ -117,5 +118,12 @@ public class AppController {
     }
 
     return "change-password-success";
+  }
+
+  private String getAppUrl(HttpServletRequest request) {
+    return ServletUriComponentsBuilder.fromRequestUri(request)
+        .replacePath(null)
+        .build()
+        .toUriString();
   }
 }
