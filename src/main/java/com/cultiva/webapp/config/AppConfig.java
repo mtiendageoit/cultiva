@@ -17,6 +17,9 @@ public class AppConfig {
   @Value("${google.cloud.storage.images.url}")
   private String googleCloudStorageImagesUrl;
 
+  @Value("${spring.mail.username}")
+  private String appMailSender;
+
   @Bean
   public RestTemplate restTemplate() {
     return new RestTemplate();
