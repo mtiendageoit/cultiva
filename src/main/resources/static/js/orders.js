@@ -13,7 +13,7 @@ const Orders = ((element) => {
   let timer;
   const refreshMillis = 20_000; //20 seconds
 
-  const ordersModal = $('#fieldOrdersModal');
+  const ordersModal = $('#ordersModal');
   const fieldFilter = $('#fomFieldFilter');
   const statusFilter = $('#fomStatusFilter');
   const showAllFilterBtn = $('#fomShowAllFilterBtn');
@@ -45,6 +45,8 @@ const Orders = ((element) => {
       }, {
         data: 'createdAt'
       }, {
+        data: 'completedAt'
+      }, {
         data: 'elapsedTime'
       }],
       deferLoading: true,
@@ -61,7 +63,7 @@ const Orders = ((element) => {
           next: "Siguiente",
           previous: "Anterior"
         },
-        emptyTable: "Sin datos",
+        emptyTable: "Sin ordenes que mostrar",
       },
       ajax: {
         url: `api/orders/filter`,
@@ -107,14 +109,14 @@ const Orders = ((element) => {
     return new Date(year, month - 1, day, hours, minutes, seconds);
   }
 
-  element.showOrdersField = (fieldUuid) => {
+  element.showOrdersField = (fieldUuid, status = 'queued') => {
     const fields = getFieldsInList();
     fieldFilter.empty();
     fieldFilter.append(new Option('Todos', -1));
     fields.forEach(field => fieldFilter.append(new Option(field.fieldname, field.uuid)));
 
     fieldFilter.val(fieldUuid);
-    statusFilter.val('queued');
+    statusFilter.val(status);
 
     filterOrders();
 

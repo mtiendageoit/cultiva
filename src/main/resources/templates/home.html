@@ -134,18 +134,35 @@
 
                         <div id="indicesListContainer" class="mb-3"
                           style="position:absolute; top: 15px; left: 15px; z-index: 1;">
-                          <div data-toggle="dropdown" aria-expanded="true">
-                            <div class="rounded-pill text-center text-white px-4 py-2 d-flex menu-btn">
-                              <h6 id="selectedIndiceBtn" indice="" class="my-0 p-0" style="line-height: 1;">Ver Índice
-                              </h6>
+                          <div class="d-flex align-items-center">
+                            <div>
+                              <button type="button" class="btn btn-danger waves-effect" data-toggle="dropdown"
+                                aria-expanded="true">
+                                <span class="fas fa-bars align-middle"></span>
+                              </button>
+                              <div class="dropdown-menu">
+                                <a id="menuShowOrders" href="javascript:void(0)" class="dropdown-item">
+                                  <i class="fas fa-calendar-check"></i> &nbsp; Ver ordenes
+                                </a>
+                              </div>
                             </div>
-                          </div>
-                          <div class="dropdown-menu">
-                            <a href="javascript:void(0)" class="dropdown-item indice-menu-item"
-                              th:attr="indice=${indice.id},indice-name=${indice.name}" th:each="indice : ${indices}">
-                              <i class="ion ion-md-checkmark mr-1" style="display:none;"></i>
-                              <span>[[${indice.name}]]</span>
-                            </a>
+                            <div class="ml-3">
+                              <div data-toggle="dropdown" aria-expanded="true">
+                                <div class="rounded-pill text-center text-white px-4 py-2 d-flex menu-btn">
+                                  <h6 class="my-1 p-0" style="line-height: 1;">Índice:
+                                    <span id="selectedIndiceBtn" indice=""></span>
+                                  </h6>
+                                </div>
+                              </div>
+                              <div class="dropdown-menu">
+                                <a href="javascript:void(0)" class="dropdown-item indice-menu-item"
+                                  th:attr="indice=${indice.id},indice-name=${indice.name}"
+                                  th:each="indice : ${indices}">
+                                  <i class="ion ion-md-checkmark mr-1" style="display:none;"></i>
+                                  <span>[[${indice.name}]]</span>
+                                </a>
+                              </div>
+                            </div>
                           </div>
                         </div>
 
@@ -311,11 +328,11 @@
     </div>
   </div>
 
-  <div class="modal fade" id="fieldOrdersModal" data-backdrop="static">
+  <div class="modal fade" id="ordersModal" data-backdrop="static">
     <div class="modal-dialog modal-xl">
-      <form id="fieldOrdersForm" class="modal-content">
+      <form class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Ordenes del lote</h5>
+          <h5 class="modal-title">Ordenes</h5>
         </div>
         <div class="modal-body py-4">
           <div class="form-row">
@@ -346,9 +363,10 @@
                   <tr class="bg-info-900">
                     <th class="fw-900">Lote</th>
                     <th class="fw-900">Fecha procesada</th>
-                    <th class="fw-900">Estado de orden</th>
-                    <th class="fw-900">Fecha creación</th>
-                    <th class="fw-900">Tiempo tomado</th>
+                    <th class="fw-900">Estado de la orden</th>
+                    <th class="fw-900">Fecha de creación</th>
+                    <th class="fw-900">Fecha orden completada</th>
+                    <th class="fw-900">Tiempo de proceso</th>
                   </tr>
                 </thead>
               </table>
@@ -734,7 +752,7 @@
   <script src="js/indices.js"></script>
   <script src="js/notifications.js"></script>
   <script src="js/calendar.js"></script>
-  <script src="js/weather.js"></script>
+  <script src="js/menu.js"></script>
 </body>
 
 </html>

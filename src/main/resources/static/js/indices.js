@@ -8,7 +8,6 @@ const Indices = ((element) => {
   }
   const indicesBtns = $('.indice-menu-item');
   const selectedIndiceBtn = $('#selectedIndiceBtn');
-  const container = $('#indicesListContainer');
   const legendTitleBar = $('#legendTitleBar');
   const legendBody = $('#legendBody');
   const legend = $('#legendContainer');
