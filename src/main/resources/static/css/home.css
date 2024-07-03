@@ -30,11 +30,6 @@ body,
   flex-basis: 18rem !important;
 }
 
-.navbar-search-box {
-  background: #ffffff;
-  width:300px;
-}
-
 .spinner-grow-xs {
   width: 0.5rem;
   height: 0.5rem;
@@ -144,4 +139,14 @@ body,
 .field-search:focus {
   border-color: #02bc77;
   box-shadow: 0 -1px 0 0 #02bc77 inset
+}
+
+.navbar-search-box {
+  background: #ffffff;
+  width:330px;
+}
+
+.pac-container{
+  margin-left: -25px !important;
+  width: 300px !important;
 }
