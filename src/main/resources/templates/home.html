@@ -50,53 +50,47 @@
         <div class="layout-content">
           <div class="container-fluid d-flex align-items-stretch flex-grow-1 p-0">
             <div class="chat-wrapper">
-              <div class="card flex-grow-1 position-relative overflow-hidden">
+              <div class="flex-grow-1 position-relative overflow-hidden">
                 <div class="row no-gutters h-100">
                   <div class="chat-sidebox col py-0">
-                    <div class="flex-grow-0 px-3">
-                      <div class="media align-items-center">
-                        <div class="media-body">
-                          <div class="search-btn-input-container my-3">
-                            <input id="searchControl" type="text"
-                              class="form-control search-btn-form-control chat-search" placeholder="Buscar..."
-                              autocomplete="off">
-                            <button id="cleanSearchBtn" type="button" class="close search-btn-close"
-                              data-dismiss="modal" aria-label="Close">×</button>
-                          </div>
-                        </div>
-                        <a href="javascript:void(0)"
-                          class="chat-sidebox-toggler d-lg-none d-block text-muted text-large font-weight-light pl-3">&times;</a>
-                      </div>
-                      <hr class="border-light m-0">
-                    </div>
                     <div class="flex-grow-1 position-relative">
                       <div class="chat-contacts list-group chat-scroll">
-                        <div class="pt-3 px-3 d-flex justify-content-between">
-                          <div>
-                            <p>Mis lotes</p>
-                          </div>
-                          <div class="dropright">
-                            <a href="javascript:void(0)" class="nav-link p-0 disabled-on-edit-geometry"
-                              data-toggle="dropdown">
-                              <p>+ Nuevo lote</p>
+                        <div class="flex-grow-0 text-white">
+                          <div class="d-inline-flex align-items-center justify-content-center w-100 bg-success py-3">
+                            <a href="javascript:void(0)" class="text-white d-inline-flex">
+                              <i class="fas fa-seedling text-large"></i>
+                              <h4 class="ml-1 my-0">Cultiva</h4>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-bottom">
-                              <a id="drawNewFieldMenu" href="javascript:void(0)" class="dropdown-item">
-                                <i class="fas fa-draw-polygon"></i>
-                                &nbsp; Dibujar en mapa</a>
-                              <a id="uploadFieldFileMenu" href="javascript:void(0)" class="dropdown-item"><i
-                                  class="far fa-file-image"></i>
-                                &nbsp; Cargar shapefile</a>
-                              <input class="d-none" type="file" name="uploadFieldFile" id="uploadFieldFile"
-                                accept=".zip">
+                          </div>
+                        </div>
+                        <div class="px-3 mt-3 d-flex justify-content-between align-items-center">
+                          <h4 class="m-0">Mis lotes</h4>
+                          <div class="d-flex align-items-center">
+                            <div class="dropright">
+                              <a href="javascript:void(0)"
+                                class="btn-block btn btn-success rounded-pill waves-effect disabled-on-edit-geometry"
+                                data-toggle="dropdown">+&nbsp; Nuevo</a>
+                              <div class="dropdown-menu dropdown-menu-bottom">
+                                <a id="drawNewFieldMenu" href="javascript:void(0)" class="dropdown-item">
+                                  <i class="fas fa-draw-polygon"></i>
+                                  &nbsp; Dibujar en mapa</a>
+                                <a id="uploadFieldFileMenu" href="javascript:void(0)" class="dropdown-item"><i
+                                    class="far fa-file-image"></i>
+                                  &nbsp; Cargar shapefile</a>
+                                <input class="d-none" type="file" name="uploadFieldFile" id="uploadFieldFile"
+                                  accept=".zip">
+                              </div>
                             </div>
                           </div>
                         </div>
-                        <div id="userFieldsList" style="overflow-y: auto; overflow-x: hidden;">
-
-
-
+                        <div class="px-3 mt-1 mb-3">
+                          <div class="flex-grow-1">
+                            <input id="fSearchInput" type="text" class="form-control field-search"
+                              placeholder="Filtar..." maxlength="40" autocomplete="off">
+                            <button style="margin-top: -32px; display: none;" id="fCleanSearchBtn" type="button" class="close search-btn-close" aria-label="Close">×</button>
+                          </div>
                         </div>
+                        <div id="userFieldsList" style="overflow-y: auto; overflow-x: hidden;"></div>
                       </div>
                     </div>
                     <div class="flex-grow-0 px-2">
@@ -131,26 +125,13 @@
                         </div>
                         <div id="tooltip" class="ol-popup">
                         </div>
-
-                        <div id="indicesListContainer" class="mb-3"
-                          style="position:absolute; top: 15px; left: 15px; z-index: 1;">
+                        <div class="header-bar-container" style="position:absolute; top: 8px; left: 15px; z-index: 1;">
                           <div class="d-flex align-items-center">
-                            <div>
-                              <button type="button" class="btn btn-success waves-effect" data-toggle="dropdown"
-                                aria-expanded="true">
-                                <span class="fas fa-bars align-middle"></span>
-                              </button>
-                              <div class="dropdown-menu">
-                                <a id="menuShowOrders" href="javascript:void(0)" class="dropdown-item">
-                                  <i class="fas fa-calendar-check"></i> &nbsp; Ver ordenes
-                                </a>
-                              </div>
-                            </div>
-                            <div class="ml-3">
+                            <div class="">
                               <div data-toggle="dropdown" aria-expanded="true">
                                 <div class="rounded-pill text-center text-white px-4 py-2 d-flex menu-btn">
                                   <h6 class="my-1 p-0" style="line-height: 1;">Índice:
-                                    <span id="selectedIndiceBtn" indice=""></span>
+                                    <span id="selectedIndiceBtn" indice="">NDVI</span>
                                   </h6>
                                 </div>
                               </div>
@@ -162,6 +143,20 @@
                                   <span>[[${indice.name}]]</span>
                                 </a>
                               </div>
+                            </div>
+                            <div class="ml-3">
+                              <button id="menuShowOrders" class="btn btn-success rounded-pill menu-btn">Ordenes</button>
+                            </div>
+                            <div class="search-btn-input-container ml-3">
+                              <label class="nav-item navbar-text navbar-search-box pl-3 py-0 active shadow"
+                                style="border-radius: 10rem;">
+                                <i class="ion ion-ios-search navbar-icon align-middle text-success"></i>
+                                <span class="navbar-search-input w-100">
+                                  <input id="search-input" type="text" class="form-control navbar-text mx-2 w-100" placeholder="Buscar..." autocomplete="off">
+                                </span>
+                                <button id="search-remove-search" type="button" class="btn btn-default borderless rounded-pill text-success" style="display: none;">×</button>
+                              </label>
+                              
                             </div>
                           </div>
                         </div>
@@ -753,6 +748,7 @@
   <script src="js/notifications.js"></script>
   <script src="js/calendar.js"></script>
   <script src="js/menu.js"></script>
+  <script src="js/search.js"></script>
 </body>
 
 </html>

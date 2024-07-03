@@ -3,9 +3,11 @@ const Fields = ((element) => {
   const uploadFieldFile = $('#uploadFieldFile');
   const uploadFieldFileMenu = $('#uploadFieldFileMenu');
 
+  const searchInput = $('#fSearchInput');
+  const cleanSearchBtn = $('#fCleanSearchBtn');
+
   function init() {
     initUI();
-    // return
     getUserFields();
   }
 
@@ -41,6 +43,26 @@ const Fields = ((element) => {
 
     uploadFieldFileMenu.click(onUploadFieldFileMenuClick);
     uploadFieldFile.change(onUploadFieldFileChange);
+
+    cleanSearchBtn.click(onCleanSearchClick);
+    searchInput.keyup(onSearchInputKeyup);
+  }
+
+  
+  function onSearchInputKeyup() {
+    const filter = searchInput.val();
+    element.filter(filter);
+
+    if (filter.trim().length > 0) {
+      cleanSearchBtn.show();
+    } else {
+      cleanSearchBtn.hide();
+    }
+  }
+
+  function onCleanSearchClick() {
+    searchInput.focus().val(null);
+    onSearchInputKeyup();
   }
 
   function onUploadFieldFileMenuClick() {
@@ -367,7 +389,7 @@ const Fields = ((element) => {
         </div>
         <div class="flex-grow-1">
           <div class="d-flex align-items-center flex-grow-1">
-            <div class="flex-grow-1">
+            <div class="flex-grow-1 ml-2">
               <p class="font-weight-bold m-0 text-truncate field-list-item-name">${field.name}
               </p>
               <div class="d-flex justify-content-between">
