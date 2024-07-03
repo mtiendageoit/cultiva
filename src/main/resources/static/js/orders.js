@@ -53,7 +53,7 @@ const Orders = ((element) => {
       responsive: true,
       searching: false,
       lengthChange: false,
-      pageLength: 8,
+      pageLength: 10,
       ordering: false,
       paging: true,
       info: false,
