@@ -1,12 +1,12 @@
 package com.cultiva.webapp.planet;
 
-
 import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import com.cultiva.webapp.dto.PageResult;
+import com.cultiva.webapp.google.auth.GCPAuthentication;
 import com.cultiva.webapp.planet.orders.*;
 import com.cultiva.webapp.security.UserPrincipal;
 
@@ -37,5 +37,16 @@ public class OrdersController {
     page.setData(orders.getContent());
 
     return page;
+  }
+
+  @GetMapping("/subscriptions")
+  public String key() {
+    String url = "https://us-south1-code-cultiva.cloudfunctions.net/planet-subscription-create";
+
+    try {
+      return GCPAuthentication.getIdTokenFromMetadataServer(url);
+    } catch (Exception e) {
+      return null;
+    }
   }
 }
