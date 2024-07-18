@@ -1,5 +1,7 @@
 package com.cultiva.webapp.planet;
 
+import java.io.IOException;
+
 import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -40,13 +42,10 @@ public class OrdersController {
   }
 
   @GetMapping("/subscriptions")
-  public String key() {
+  public String key() throws IOException {
     String url = "https://us-south1-code-cultiva.cloudfunctions.net/planet-subscription-create";
 
-    try {
-      return GCPAuthentication.getIdTokenFromMetadataServer(url);
-    } catch (Exception e) {
-      return null;
-    }
+    return GCPAuthentication.getIdTokenFromMetadataServer(url);
+
   }
 }
