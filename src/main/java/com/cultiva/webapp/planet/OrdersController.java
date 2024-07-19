@@ -42,10 +42,14 @@ public class OrdersController {
   }
 
   @GetMapping("/subscriptions")
-  public String key() throws IOException {
+  public String key() {
     String url = "https://us-south1-code-cultiva.cloudfunctions.net/planet-subscription-create";
 
-    return GCPAuthentication.getIdTokenFromMetadataServer(url);
+    try {
+      return GCPAuthentication.getIdTokenFromMetadataServer(url);
+    } catch (Exception e) {
+      return e.toString();
+    }
 
   }
 }
